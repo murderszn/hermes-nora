@@ -10,12 +10,6 @@ Local setup of [Hermes Agent](https://hermes-agent.nousresearch.com/) named **No
 
 ![Hermes dashboard wallpaper](dashboard/assets/hermes-wallpaper.jfif)
 
-## Goals
-
-- Keep the agent running and watchable from one local dashboard.
-- Channel all comms through Discord.
-- Capture the exact dashboard + launcher + Hermes config used here so it’s reproducible.
-
 ## Layout
 
 ```text
@@ -35,8 +29,9 @@ hermes-nora/
 │   ├── auth.json           # tokens are masked (***)
 │   ├── .env                # secrets are masked (***)
 │   └── SOUL.md
-├── scripts/
-│   └── Hermes Dashboard.bat
+├── skills/           # Custom Hermes skills derived from operator learnings
+├── learnings/        # Daily diagnostics and improvement notes
+│   └── 2026-06-27-diagnostics-and-learnings.md
 └── README.md
 ```
 
@@ -56,3 +51,7 @@ hermes-nora/
 - Hermes runtime state: `C:\Users\jjohn\AppData\Local\hermes\`.
 - The dashboard polls `/api/state` every 5 seconds.
 - Secrets in `hermes/.env` and `hermes/auth.json` are redacted before commit.
+
+## Learnings
+
+See [`learnings/2026-06-27-diagnostics-and-learnings.md`](learnings/2026-06-27-diagnostics-and-learnings.md) for a categorical diagnosis of today’s warnings/errors, proposed skills, and correction items.

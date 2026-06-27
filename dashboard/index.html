@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HERMES :: Agent Control</title>
+<style>
+  :root{
+    --deep:#001570; --deep2:#00093f; --ink:#000620;
+    --ice:#bfe9ff; --cyan:#5fd0ff; --line:rgba(150,200,255,.22);
+    --txt:#dcefff; --muted:#7d93d8;
+    --green:#5effc0; --amber:#ffce5a; --red:#ff6b7a;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%;overflow:hidden}
+  body{
+    font-family:'Consolas','SF Mono',ui-monospace,monospace;
+    color:var(--txt); background:var(--deep);
+    letter-spacing:.3px;
+  }
+  /* ---- background layers ---- */
+  .bg{position:fixed;inset:0;z-index:-5;
+    background:
+      radial-gradient(120% 80% at 18% 12%, rgba(40,80,200,.3), transparent 60%),
+      radial-gradient(100% 70% at 80% 8%, rgba(10,30,120,.4), transparent 60%),
+      linear-gradient(180deg,#01186e 0%, #001054 45%, #000827 100%);}
+  .grid-ov{position:fixed;inset:0;z-index:-2;pointer-events:none;opacity:.16;
+    background-image:linear-gradient(rgba(160,200,255,.5) 1px,transparent 1px),
+                     linear-gradient(90deg,rgba(160,200,255,.5) 1px,transparent 1px);
+    background-size:54px 54px;
+    mask-image:radial-gradient(circle at 50% 30%,#000 35%,transparent 80%);}
+  .scan{position:fixed;inset:0;z-index:60;pointer-events:none;opacity:.25;
+    background:repeating-linear-gradient(transparent 0 2px,rgba(0,0,30,.25) 2px 3px)}
+
+  /* ---- fullscreen btn ---- */
+  #fsBtn{position:fixed;top:16px;right:18px;z-index:80;cursor:pointer;
+    font-family:inherit;font-size:.64rem;letter-spacing:2px;color:var(--ice);
+    background:rgba(10,30,90,.5);border:1px solid var(--line);border-radius:8px;
+    padding:7px 12px;backdrop-filter:blur(6px);transition:.2s}
+  #fsBtn:hover{background:rgba(40,90,200,.5);color:#fff;box-shadow:0 0 14px rgba(95,208,255,.4)}
+
+  main{position:relative;z-index:2;width:100%;max-width:1400px;margin:0 auto;
+    padding:10px 16px 6px;display:grid;
+    grid-template-columns:1fr;
+    grid-template-rows:25vh 11.5vh 21vh calc(42.5vh - 24px);
+    grid-template-areas:
+      "hero"
+      "r1"
+      "r2"
+      "r3";
+    gap:6px;
+    height:100vh;overflow:hidden}
+
+  .row2{grid-area:r1}
+  .chDiagRow{grid-area:r2}
+  .msgLiveRow{grid-area:r3}
+
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:6px;align-items:stretch}
+
+  .chDiagRow{display:grid;grid-template-columns:1fr 1fr;gap:6px;align-items:stretch;overflow:hidden}
+  .msgLiveRow{display:grid;grid-template-columns:1fr 1fr;gap:6px;align-items:stretch;overflow:hidden}
+  .chDiagRow>.panel, .msgLiveRow>.panel{height:100%;min-height:0;overflow:hidden}
+  .chDiagRow [style*="grid-template-rows"], .chDiagRow [style*="grid-template-rows"]>.panel{height:100%;min-height:0;overflow:hidden}
+
+  @media (max-width: 1000px){
+    .grid2, .chDiagRow, .msgLiveRow{grid-template-columns:1fr}
+  }
+
+  @media (max-width: 900px){
+    main{
+      grid-template-columns:1fr;
+      grid-template-rows:25vh 11.5vh 21vh calc(42.5vh - 24px);
+      grid-template-areas:
+        "hero"
+        "r1"
+        "r2"
+        "r3";
+    }
+  }
+
+  footer{position:fixed;left:0;right:0;bottom:0;z-index:2;text-align:center;color:var(--muted);
+    font-size:.58rem;letter-spacing:2px;padding:4px 0;pointer-events:none}
+  .hero{grid-area:hero;position:relative;border-radius:14px;overflow:hidden;flex:0 1 auto;
+    height:100%;min-height:0;max-height:none;
+    border:1px solid rgba(150,200,255,.35);
+    box-shadow:0 0 46px rgba(95,208,255,.28), inset 0 0 50px rgba(0,18,80,.45);}
+  .hero img{display:block;width:100%;height:100%;object-fit:cover;object-position:62% 32%}
+  .hero .vig{position:absolute;inset:0;pointer-events:none;
+    background:linear-gradient(180deg, rgba(0,8,40,.25) 0%, transparent 22%, transparent 62%, rgba(0,6,30,.85) 100%);}
+  .hero::before,.hero::after{content:'';position:absolute;width:22px;height:22px;border:2px solid var(--cyan);z-index:3;opacity:.9}
+  .hero::before{top:9px;left:9px;border-right:0;border-bottom:0}
+  .hero::after{bottom:9px;right:9px;border-left:0;border-top:0}
+  .heronav{position:absolute;left:0;right:0;top:0;z-index:4;display:flex;align-items:center;justify-content:space-between;
+    gap:14px;padding:12px 16px;font-size:.66rem;letter-spacing:1px;white-space:nowrap;
+    background:linear-gradient(180deg, rgba(0,8,38,.88), rgba(0,8,38,.35) 70%, transparent)}
+  .heronav .title h1{margin:0;font-size:1.35rem;letter-spacing:4px}
+  .heronav .title p{margin:1px 0 0;font-size:.58rem;letter-spacing:2px;color:var(--muted)}
+  .heronav .clock{text-align:right;margin-left:auto}
+  .heronav .clock .t{font-size:1.35rem;font-weight:800;color:#fff;letter-spacing:2px}
+  .heronav .clock .d{font-size:.62rem;color:var(--muted);letter-spacing:1.5px}
+  .heronav .live{display:inline-flex;align-items:center;gap:7px;font-size:.6rem;letter-spacing:2px;color:var(--green);margin-top:3px}
+  .heronav .live .dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green);animation:pulse 1.6s infinite}
+  .heronav .live.stale{color:var(--amber)} .heronav .live.stale .dot{background:var(--amber);box-shadow:0 0 10px var(--amber)}
+  .herobar{position:absolute;left:0;right:0;bottom:0;z-index:4;display:flex;align-items:center;
+    gap:10px;padding:11px 16px;font-size:.66rem;letter-spacing:1px;white-space:nowrap;overflow:hidden;
+    background:linear-gradient(0deg, rgba(0,8,38,.92), rgba(0,8,38,.4) 60%, transparent);}
+  .herobar b{color:#fff;font-weight:700}
+  .herobar .pill{display:inline-flex;align-items:center;gap:7px;font-weight:700;letter-spacing:2px}
+  .herobar .pdot{width:9px;height:9px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green);animation:pulse 1.6s infinite}
+  .herobar .pdot.off{background:var(--red);box-shadow:0 0 10px var(--red)}
+  .herobar .sep{color:var(--muted)}
+  .herobar .hb{color:var(--ice)}
+  .herobar .right{margin-left:auto;color:var(--muted);letter-spacing:2px}
+
+  /* ---- panels ---- */
+  .panel{position:relative;background:rgba(0,12,58,.5);border:1px solid var(--line);
+    border-radius:12px;padding:10px 12px;backdrop-filter:blur(10px);flex:0 0 auto;
+    box-shadow:inset 0 0 28px rgba(95,208,255,.05),0 6px 26px rgba(0,2,20,.5)}
+  .panel::before,.panel::after{content:'';position:absolute;width:14px;height:14px;border:2px solid var(--cyan);opacity:.75}
+  .panel::before{top:-1px;left:-1px;border-right:0;border-bottom:0;border-top-left-radius:13px}
+  .panel::after{bottom:-1px;right:-1px;border-left:0;border-top:0;border-bottom-right-radius:13px}
+  .panel h2{font-size:.64rem;letter-spacing:4px;color:var(--cyan);text-transform:uppercase;
+    margin-bottom:7px;display:flex;align-items:center;gap:8px;font-weight:700;flex:0 0 auto}
+  .panel h2 .bar{flex:1;height:1px;background:linear-gradient(90deg,var(--line),transparent)}
+  .panel h2 .sm{color:var(--muted);font-weight:400;letter-spacing:1px}
+  .panel.grow{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;overflow:hidden}
+
+  /* ---- sidebar channels ---- */
+  .chwrap{display:flex;flex-direction:column;gap:8px;flex:1 1 auto;min-height:0;overflow-y:auto;padding-right:4px}
+  .chgroup{display:flex;flex-direction:column;gap:2px}
+  .chgroup-title{font-size:.55rem;letter-spacing:2px;color:var(--muted);text-transform:uppercase;
+    padding:4px 8px 2px;font-weight:700}
+
+  /* ---- KPIs and layout ---- */
+  .kpis{display:grid;grid-template-columns:1fr 1fr;gap:8px;flex:1}
+  .kpi{background:rgba(95,208,255,.05);border:1px solid var(--line);border-radius:9px;padding:8px 11px}
+  .kpi .v{font-size:1.32rem;font-weight:800;color:#fff}
+  .kpi .v.cyan{color:var(--cyan)} .kpi .v.amber{color:var(--amber)}
+  .kpi .k{font-size:.55rem;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-top:2px}
+
+  .topgrid{grid-area:main;display:flex;flex-direction:column;gap:10px;min-height:0;overflow-y:auto;padding-right:4px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .row{display:flex;justify-content:space-between;gap:10px;padding:5px 0;
+    border-bottom:1px dashed rgba(150,200,255,.12);font-size:.76rem}
+  .row:last-child{border-bottom:0}
+  .row .lab{color:var(--muted)} .row .val{color:#fff;font-weight:600;text-align:right;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .badge{padding:2px 9px;border-radius:20px;font-size:.6rem;letter-spacing:1px;font-weight:700}
+  .badge.ok{background:rgba(94,255,192,.15);color:var(--green);border:1px solid rgba(94,255,192,.4)}
+  .badge.bad{background:rgba(255,107,122,.15);color:var(--red);border:1px solid rgba(255,107,122,.4)}
+
+  .panel.tall{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;overflow:hidden}
+  .msgboard{flex:1 1 auto;min-height:0;overflow-y:auto;padding-right:4px}
+  .feed{display:flex;flex-direction:column;gap:6px;overflow-y:auto;padding-right:4px}
+  .ev{display:flex;gap:9px;align-items:flex-start;font-size:.74rem;padding:6px 9px;
+    background:rgba(95,208,255,.04);border-left:2px solid rgba(95,208,255,.4);border-radius:6px;animation:flash .6s ease}
+  @keyframes flash{from{background:rgba(95,208,255,.22)}to{background:rgba(95,208,255,.04)}}
+  .ev.in{border-left-color:var(--cyan)} .ev.out{border-left-color:var(--green)}
+  .ev.tool{border-left-color:var(--amber)} .ev.sys{border-left-color:#5f76c0}
+  .ev .ico{font-size:.9rem;line-height:1.3;color:var(--ice)}
+  .ev .body{flex:1;min-width:0}
+  .ev .who{color:var(--cyan);font-weight:700} .ev.out .who{color:var(--green)}
+  .ev .msg{color:var(--txt);word-break:break-word}
+  .ev .tm{color:var(--ice);font-size:.62rem;font-weight:700;white-space:nowrap;opacity:.9}
+
+  /* ---- message board ---- */
+  .msg-header{padding:6px 10px;font-size:.78rem;letter-spacing:1px;color:var(--muted);
+    border-bottom:1px solid rgba(150,200,255,.18);margin-bottom:4px;flex-shrink:0}
+  .msg{display:flex;gap:10px;align-items:flex-start;padding:6px 10px;border-radius:8px;transition:.15s}
+  .msg:hover{background:rgba(95,208,255,.06)}
+  .msg .avatar{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;
+    font-weight:800;font-size:.78rem;flex-shrink:0;border:1px solid var(--line)}
+  .msg .meta{font-size:.58rem;color:var(--muted);letter-spacing:1px;margin-top:4px;display:flex;gap:8px;align-items:center}
+  .msg .name{font-weight:700;font-size:.82rem;color:#fff}
+  .msg .name-in{color:var(--cyan)}
+  .msg .name-out{color:var(--green)}
+  .msg .txt{color:var(--txt);font-size:.82rem;line-height:1.35;word-break:break-word;margin-top:3px}
+  .date-sep{font-size:.6rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase;
+    padding:8px 6px 4px;display:flex;align-items:center;gap:10px}
+  .date-sep::after{content:'';flex:1;height:1px;background:var(--line)}
+
+  .err{font-size:.72rem;padding:5px 8px;border-radius:6px;margin-bottom:5px;
+    background:rgba(255,107,122,.07);border-left:2px solid var(--red)}
+  .err.WARNING{background:rgba(255,206,90,.07);border-left-color:var(--amber)}
+  .err .lv{font-weight:700;color:var(--amber)} .err.ERROR .lv,.err.CRITICAL .lv{color:var(--red)}
+  .err .mg{color:var(--muted);display:block;margin-top:2px}
+  .diaglist{flex:1 1 auto;min-height:0;max-height:100%;overflow-y:auto;padding-right:4px}
+
+  .muted{color:var(--muted);font-size:.74rem;text-align:center;padding:12px 0}
+  ::-webkit-scrollbar{width:6px}
+  ::-webkit-scrollbar-thumb{background:rgba(95,208,255,.35);border-radius:6px}
+
+  :fullscreen #fsBtn,:-webkit-full-screen #fsBtn{opacity:0;pointer-events:none}
+</style>
+</head>
+<body>
+  <div class="bg"></div>
+  <div class="grid-ov"></div>
+  <div class="scan"></div>
+  <button id="fsBtn">⛶ FULLSCREEN</button>
+
+  <main>
+    <div class="hero">
+      <img src="/assets/wallpaper" alt="Hermes Agent">
+      <div class="vig"></div>
+
+      <div class="heronav">
+        <div class="title">
+          <h1 style="margin:0;font-size:1.35rem;letter-spacing:4px">HERMES — NORA</h1>
+          <p style="margin:1px 0 0;font-size:.58rem;letter-spacing:2px;color:var(--muted)">Autonomous Agent · Control Interface</p>
+        </div>
+        <div class="clock">
+          <div class="t" id="clock">--:--:--</div>
+          <div class="d" id="date">—</div>
+          <div class="live" id="live"><span class="dot"></span><span id="livetxt">CONNECTING</span></div>
+        </div>
+      </div>
+
+      <div class="herobar">
+        <span class="pill"><span class="pdot" id="heroDot"></span><span id="heroState">INITIALIZING</span></span>
+        <span class="sep">·</span><span class="hb" id="heroBot">—</span>
+        <span class="sep">·</span><span class="hb">PID&nbsp;<b id="kPid">—</b></span>
+        <span class="sep">·</span><span class="hb"><b id="kAgents">0</b>&nbsp;AGENTS</span>
+        <span class="sep">·</span><span class="hb"><b id="kState">—</b></span>
+        <span class="sep">·</span><span class="hb"><b id="kLast">—</b></span>
+        <span class="right" id="heroRight">AGENT PORTAL</span>
+      </div>
+    </div>
+
+    <div class="row2 grid2">
+      <div class="panel">
+        <h2>Watchdog<span class="bar"></span></h2>
+        <div class="row"><span class="lab">Auto-restart</span><span class="val"><span class="badge" id="wTask">—</span></span></div>
+        <div class="row"><span class="lab">Schedule</span><span class="val" id="wNext">—</span></div>
+        <div class="row"><span class="lab">Restarts</span><span class="val" id="wCount">0</span></div>
+        <div class="row"><span class="lab">Last restart</span><span class="val" id="wLast">—</span></div>
+      </div>
+      <div class="panel">
+        <h2>Discord Uplink<span class="bar"></span></h2>
+        <div class="row"><span class="lab">Identity</span><span class="val" id="dBot">—</span></div>
+        <div class="row"><span class="lab">Link</span><span class="val"><span class="badge" id="dState">—</span></span></div>
+        <div class="row"><span class="lab">Messages</span><span class="val" id="dMsgs">0</span></div>
+        <div class="row"><span class="lab">Replies</span><span class="val" id="dResp">0</span></div>
+        <div class="row"><span class="lab">Avg response</span><span class="val" id="dAvg">—</span></div>
+        <div class="row"><span class="lab">Last reply</span><span class="val" id="dLast">—</span></div>
+      </div>
+    </div>
+
+    <div class="chDiagRow">
+      <div style="display:grid;grid-template-rows:1fr 1fr;gap:6px;height:100%">
+        <div class="panel">
+          <h2>Neural Core<span class="bar"></span></h2>
+          <div class="row"><span class="lab">Model</span><span class="val" id="aModel">—</span></div>
+          <div class="row"><span class="lab">Provider</span><span class="val" id="aProv">—</span></div>
+          <div class="row"><span class="lab">API today</span><span class="val" id="aCalls">0</span></div>
+          <div class="row"><span class="lab">Avg latency</span><span class="val" id="aLat">—</span></div>
+          <div class="row"><span class="lab">Tokens</span><span class="val" id="aTokens">0</span></div>
+          <div class="row"><span class="lab">Tool runs</span><span class="val" id="aTools">0</span></div>
+        </div>
+        <div class="panel grow">
+          <h2>Channels <span class="sm" id="chCount"></span><span class="bar"></span></h2>
+          <div class="chwrap" id="chWrap"><div class="muted">loading…</div></div>
+        </div>
+      </div>
+      <div class="panel">
+        <h2>Diagnostics <span class="sm" id="eCount"></span><span class="bar"></span></h2>
+        <div class="diaglist" id="errList"><div class="muted">no issues</div></div>
+      </div>
+    </div>
+
+    <div class="msgLiveRow">
+      <div class="panel tall">
+        <h2>Messages <span class="sm" id="msgCount"></span><span class="bar"></span></h2>
+        <div class="msgboard" id="msgBoard"><div class="muted">select a channel</div></div>
+      </div>
+      <div class="panel grow">
+        <h2>Live Activity Stream<span class="bar"></span></h2>
+        <div class="feed" id="feed"><div class="muted">awaiting telemetry…</div></div>
+      </div>
+    </div>
+  </main>
+
+<script>
+const $=id=>document.getElementById(id);
+function tick(){ $("clock").textContent=new Date().toLocaleTimeString('en-GB'); }
+setInterval(tick,1000);tick();
+
+// fullscreen
+const fsBtn=$("fsBtn");
+function toggleFs(){
+  if(!document.fullscreenElement){ (document.documentElement.requestFullscreen||document.documentElement.webkitRequestFullscreen).call(document.documentElement); }
+  else{ (document.exitFullscreen||document.webkitExitFullscreen).call(document); }
+}
+fsBtn.onclick=toggleFs;
+document.addEventListener('keydown',e=>{ if(e.key==='f'||e.key==='F') toggleFs(); });
+document.addEventListener('fullscreenchange',()=>{ fsBtn.textContent=document.fullscreenElement?'⛶ EXIT':'⛶ FULLSCREEN'; });
+
+function setLive(ok){
+  const l=$("live");
+  if(ok){l.classList.remove("stale");$("livetxt").textContent="LIVE";}
+  else{l.classList.add("stale");$("livetxt").textContent="RECONNECTING";}
+}
+function evIcon(t){return t==="in"?"▸":t==="out"?"◂":t==="tool"?"⚙":"●";}
+function hm(ts){return ts?ts.slice(11,16):"";}
+function esc(s){return (s==null?"":String(s)).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
+function fmt(n){return (n||0).toLocaleString();}
+
+let selectedChannel=null;
+
+async function refresh(){
+  let s;
+  try{ s=await (await fetch('/api/state',{cache:'no-store'})).json(); }
+  catch(e){ setLive(false); return; }
+  setLive(true);
+  $("date").textContent=s.server_date;
+
+  const on=s.system.gateway_online;
+  // hero status bar
+  $("heroState").textContent=on?"AGENT ONLINE":"AGENT OFFLINE";
+  $("heroDot").className="pdot"+(on?"":" off");
+  $("heroBot").textContent=(s.discord.bot||"hermes")+"  ·  "+s.discord.state.toUpperCase();
+  $("heroRight").textContent=(s.agent.model||"idle");
+
+  $("kAgents").textContent=s.system.active_agents;
+  $("kPid").textContent=s.system.gateway_pid||"—";
+  $("kLast").textContent=s.system.last_activity||"—";
+  $("kState").textContent=(s.system.gateway_state||"—").toUpperCase();
+
+  $("dBot").textContent=s.discord.bot||"—";
+  const ds=$("dState"),st=(s.discord.state||"offline");
+  ds.textContent=st.toUpperCase(); ds.className="badge "+(st==="connected"?"ok":"bad");
+  $("dMsgs").textContent=s.discord.msgs_today;
+  $("dResp").textContent=s.discord.responses_today;
+  $("dAvg").textContent=s.discord.avg_response!=null?s.discord.avg_response+"s":"—";
+  const lr=s.discord.last_response;
+  $("dLast").textContent=lr?(lr.chars+" chars · "+lr.time+"s"):"—";
+
+  $("aModel").textContent=s.agent.model||"idle";
+  $("aProv").textContent=s.agent.provider||"—";
+  $("aCalls").textContent=s.agent.api_today;
+  $("aLat").textContent=s.agent.avg_latency!=null?s.agent.avg_latency+"s":"—";
+  $("aTokens").textContent=fmt(s.agent.tokens_today);
+  $("aTools").textContent=(s.agent.recent_tools||[]).length;
+
+  const tk=s.watchdog.task||{};
+  const wt=$("wTask");
+  wt.textContent=tk.present?(tk.status||"ACTIVE").toUpperCase():"MISSING";
+  wt.className="badge "+(tk.present?"ok":"bad");
+  $("wNext").textContent=tk.next_run||"—";
+  $("wCount").textContent=s.watchdog.restarts;
+  $("wLast").textContent=s.watchdog.last_restart||"none";
+
+  $("eCount").textContent=s.errors.count_today+" today";
+  const el=$("errList");
+  el.innerHTML=s.errors.recent.length? s.errors.recent.slice().reverse().map(e=>
+    `<div class="err ${e.level}"><span class="lv">${e.level}</span> ${esc(e.logger)}<span class="mg">${esc(e.text)}</span></div>`).join("")
+    : '<div class="muted">no issues</div>';
+
+  $("chCount").textContent=s.channels.total;
+  $("msgCount").textContent=(s.agent.recent_tools||[]).length+" tools logged";
+  const chWrap=$("chWrap");
+
+  function channelIcon(c){
+    if(c.type==="channel") return `#`;
+    if(c.type==="dm") return `@`;
+    return `💬`;
+  }
+
+  function channelGroups(items){
+    const groups={channel:{label:"Channels",items:[]}, dm:{label:"Direct",items:[]}, thread:{label:"Threads",items:[]}};
+    for(const c of items){
+      const g=groups[c.type];
+      if(!g) groups[c.type]={label:c.type,items:[c]};
+      else g.items.push(c);
+    }
+    return Object.keys(groups).map(k=>({label:groups[k].label, type:k, items:groups[k].items}));
+  }
+
+  function renderSidebar(){
+    if(!s.channels.items.length){
+      chWrap.innerHTML='<div class="muted">no channels</div>';
+      return;
+    }
+    const groups=channelGroups(s.channels.items);
+    chWrap.innerHTML=groups.map(g=>`
+      <div class="chgroup">
+        <div class="chgroup-title">${esc(g.label)}</div>
+        ${g.items.map(c=>{
+          const active=(selectedChannel===c.id)?' active':'';
+          const msgs=(s.channels.messages_by_id[c.id]||[]);
+          const last=(msgs[0]||{});
+          const time=last.ts? last.ts.slice(11,16):'';
+          const preview= esc((c.preview||'')).slice(0,45);
+          return `<div class="ch${active}" data-chat="${esc(c.id)}" style="cursor:pointer;transition:.15s">
+            <div class="ico">${channelIcon(c)}</div>
+            <div class="nm" style="flex:1;min-width:0">
+              <div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(c.name)||'(unnamed)'}</div>
+              ${preview?`<div style="font-size:.6rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${preview}</div>`:''}
+            </div>
+            <div class="count">${time||''}</div>
+          </div>`;
+        }).join('')}
+      </div>`).join('');
+    chWrap.querySelectorAll('.ch').forEach(row=>{
+      row.onclick=()=>{
+        selectedChannel=row.getAttribute('data-chat');
+        renderSidebar();
+        renderMessages();
+      };
+    });
+  }
+
+  function renderMessages(){
+    const board=$("msgBoard");
+    const chatId=selectedChannel;
+    if(!chatId){
+      board.innerHTML='<div class="muted">select a channel</div>';
+      $("msgCount").textContent='';
+      return;
+    }
+    const msgs=(s.channels.messages_by_id[chatId]||[]);
+    if(!msgs.length){
+      board.innerHTML='<div class="muted">no messages</div>';
+      $("msgCount").textContent='0 messages';
+      return;
+    }
+    $("msgCount").textContent=msgs.length+' messages';
+    const channel=s.channels.items.find(c=>c.id===chatId);
+    const chName=(channel&&channel.name)||chatId;
+
+    let html=`<div class="msg-header"><b># ${esc(chName)}</b><span style="color:var(--muted);margin-left:8px;font-size:.7rem">${esc(channel&&channel.type||'')}</span></div>`;
+
+    let cur='';
+    let rendered=0;
+    msgs.forEach(m=>{
+      const day=m.ts? m.ts.slice(0,10):'';
+      if(day && day!==cur){
+        cur=day;
+        if(day===s.server_date){
+          html+=`<div class="date-sep"><span>Today</span></div>`;
+        } else if(day===new Date(Date.now()-86400000).toISOString().slice(0,10)){
+          html+=`<div class="date-sep"><span>Yesterday</span></div>`;
+        } else {
+          html+=`<div class="date-sep"><span>${esc(day)}</span></div>`;
+        }
+      }
+      const name=m.user||(m.type==='out'?'hermes':'?');
+      const initials=name.slice(0,2).toUpperCase();
+      const hue=(name.split('').reduce((a,b)=>a+b.charCodeAt(0),0)%360);
+      const avatarBg=`hsl(${hue},55%,22%)`;
+      const avatarColor=`hsl(${hue},75%,82%)`;
+      const whoClass=m.type==='out'?'name-out':'name-in';
+      const txt=esc(m.text);
+      html+=`<div class="msg">
+        <div class="avatar" style="background:${avatarBg};color:${avatarColor}">${initials}</div>
+        <div style="flex:1;min-width:0">
+          <div class="meta"><span class="name ${whoClass}">${esc(name)}</span><span>${m.ts? m.ts.slice(11,16):''}</span></div>
+          <div class="txt">${txt}</div>
+        </div>
+      </div>`;
+      rendered++;
+    });
+    board.innerHTML=html;
+  }
+
+  renderSidebar();
+  if(!selectedChannel && s.channels.items.length){
+    const byTime = s.channels.items.slice().sort((a,b) => {
+      const ta = (a.last_ts || '').replace(/[-: ]/g, '');
+      const tb = (b.last_ts || '').replace(/[-: ]/g, '');
+      return tb.localeCompare(ta);
+    });
+    selectedChannel = byTime[0].id;
+    renderSidebar();
+  }
+  renderMessages();
+
+  const feed=$("feed"); feed.innerHTML=s.activity.length? s.activity.map(e=>{
+    const who=e.type==="in"?`<span class="who">${esc(e.user||'user')}</span> `:e.type==="out"?`<span class="who">hermes</span> `:"";
+    return `<div class="ev ${e.type}"><span class="ico">${evIcon(e.type)}</span><div class="body">${who}<span class="msg">${esc(e.text)}</span></div><span class="tm">${hm(e.ts)}</span></div>`;
+  }).join("") : '<div class="muted">no recent activity</div>';
+
+}
+
+refresh(); setInterval(refresh,5000);
+</script>
+</body>
+</html>

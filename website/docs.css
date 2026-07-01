@@ -617,7 +617,9 @@
   .docs-hero-links .btn {
     justify-content: center;
     width: 100%;
-    min-height: 3rem;
+    padding-top: 1.0625rem;
+    padding-bottom: 1.125rem;
+    line-height: 1.5;
   }
 
   .docs-main {

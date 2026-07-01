@@ -1,23 +1,22 @@
-# Hermes Dashboard — Nora Control Interface
+# Hermes-Nora
 
-Standalone JARVIS-style local dashboard for the Hermes Agent runtime.  
-Served at `http://127.0.0.1:7878` by `dashboard.py` (Python stdlib only).
+![Repo size](https://img.shields.io/github/repo-size/murderszn/Hermes-Nora)
+![Last commit](https://img.shields.io/github/last-commit/murderszn/Hermes-Nora)
+![License: Unlicense](https://img.shields.io/badge/License-Unlicense-blue.svg)
 
-## Launch
+Local setup of [Hermes Agent](https://hermes-agent.nousresearch.com/) named **Nora**, bound to Discord, with a custom JARVIS-style control dashboard.
 
-- **Launcher:** `Hermes Dashboard.bat` (root of this folder)
-- **Server:** `dashboard.py`
-- **Port:** 7878
-- **Browser:** Chrome or Edge recommended
+## Dashboard preview
 
-## Data Sources
+![Hermes dashboard wallpaper](dashboard/assets/hermes-wallpaper.jfif)
 
-Reads directly from the Hermes runtime at `C:/Users/jjohn/AppData/Local/hermes/`:
-- `logs/gateway.log` — gateway events
-- `logs/agent.log` — agent activity
-- `logs/errors.log` — error stream
-- `gateway_state.json` — live runtime state
-- `channel_directory.json` — channel/thread routing
+## Goals
+
+- Keep the agent running and watchable from one local dashboard.
+- Channel all comms through Discord.
+- Capture the exact dashboard + launcher + Hermes config used here so it’s reproducible.
+
+> Large runtime data (`state.db`, `bin/`, model caches) are excluded on purpose.
 
 ## Layout (1080p no-scroll)
 

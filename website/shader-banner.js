@@ -9,7 +9,7 @@
   const FS = `
 precision highp float;
 uniform vec2 u_res;
-uniform float u_phase;
+uniform float u_time;
 uniform float u_seed;
 uniform float u_scale;
 uniform float u_density;
@@ -22,13 +22,27 @@ void main(){
   vec2 p = (gl_FragCoord.xy - 0.5 * u_res) / mn;
   p *= mix(1.0, 2.5, u_scale) * 3.0;
   p += vec2(fract(u_seed * 0.193), fract(u_seed * 0.317)) * 2.0;
-  p += vec2(cos(u_phase), sin(u_phase)) * 0.04;
+  p += vec2(sin(u_time * 0.11), cos(u_time * 0.14)) * 0.05;
 
   float freq = 2.8 + u_density * 6.0;
   vec2 gv = p * freq;
+  vec2 id = floor(gv);
   vec2 f = fract(gv);
 
+  float rowWave = sin(u_time * 0.38 + id.y * 0.785398);
+  float colWave = sin(u_time * 0.51 + id.x * 1.047198);
+  float cellWave = sin(u_time * 0.29 + dot(id, vec2(0.513, 0.877)));
+  float cellWaveB = cos(u_time * 0.44 + id.x * 0.619 - id.y * 0.431);
+
+  vec2 drift = vec2(
+    rowWave * 0.09 + cellWave * 0.05,
+    colWave * 0.09 + cellWaveB * 0.05
+  );
+  f = fract(f + drift);
+
   float margin = 0.10 + u_detail * 0.04;
+  margin += sin(u_time * 0.62 + id.x * 0.41 + id.y * 0.67) * 0.016;
+
   float inBox = step(margin, f.x) * step(f.x, 1.0 - margin)
               * step(margin, f.y) * step(f.y, 1.0 - margin);
 
@@ -38,7 +52,6 @@ void main(){
 
   const PARAMS = {
     seed: 2251,
-    loop: 48,
     yellow: '#f9ae2a',
     black: '#0a0908',
     scale: 0.55,
@@ -103,7 +116,7 @@ void main(){
 
     const U = {
       u_res: gl.getUniformLocation(prog, 'u_res'),
-      u_phase: gl.getUniformLocation(prog, 'u_phase'),
+      u_time: gl.getUniformLocation(prog, 'u_time'),
       u_seed: gl.getUniformLocation(prog, 'u_seed'),
       u_scale: gl.getUniformLocation(prog, 'u_scale'),
       u_density: gl.getUniformLocation(prog, 'u_density'),
@@ -135,13 +148,10 @@ void main(){
       rafId = 0;
       if (!visible) return;
 
-      const elapsed = (now - t0) / 1000;
-      const phase = prefersReducedMotion
-        ? 0.0
-        : (elapsed / PARAMS.loop * Math.PI * 2) % (Math.PI * 2);
+      const elapsed = prefersReducedMotion ? 0.0 : (now - t0) / 1000;
 
       gl.uniform2f(U.u_res, width, height);
-      gl.uniform1f(U.u_phase, phase);
+      gl.uniform1f(U.u_time, elapsed);
       gl.uniform1f(U.u_seed, (PARAMS.seed % 10000) * 0.6180339887 % 12.566);
       gl.uniform1f(U.u_scale, PARAMS.scale);
       gl.uniform1f(U.u_density, PARAMS.density);

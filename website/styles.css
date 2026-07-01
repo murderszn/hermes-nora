@@ -1206,13 +1206,14 @@ a {
   align-items: baseline;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: 1.5rem;
+  gap: 1.25rem 2rem;
   max-width: var(--page-max);
-  margin: 0 auto 4rem;
+  margin: 0 auto clamp(2rem, 4vw, 3rem);
 }
 
 .features-header-main {
   flex: 1 1 280px;
+  min-width: 0;
 }
 
 .features-title--header {
@@ -1523,7 +1524,23 @@ a {
   .features-header {
     flex-direction: column;
     align-items: flex-start;
-    gap: 1rem;
+    gap: 0.875rem;
+    margin-bottom: 1.75rem;
+  }
+
+  .features-header-main {
+    flex: 0 0 auto;
+    width: 100%;
+  }
+
+  .features-header-aside {
+    flex: 0 0 auto;
+    max-width: none;
+    width: 100%;
+  }
+
+  .features-title--header {
+    margin-bottom: 0;
   }
 
   .feature-grid {

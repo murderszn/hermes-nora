@@ -17,7 +17,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Outfit:wght@700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=8">
+  <link rel="stylesheet" href="styles.css?v=9">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>◉</text></svg>">
 </head>
 <body>
@@ -76,15 +76,19 @@
           Always on, always local. A charming ops assistant with full
           machine access — ready day or night, whenever you need her.
         </p>
-        <div class="hero-actions">
-          <a href="#" data-discord-link class="btn btn-hero-outline btn-mono" target="_blank" rel="noopener">
-            <svg width="16" height="16" fill="currentColor" aria-hidden="true"><use href="#icon-discord"/></svg>
-            Join Discord
-          </a>
-          <a href="https://github.com/murderszn/hermes-nora" class="btn btn-hero-outline btn-mono" target="_blank" rel="noopener">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
-            View source
-          </a>
+        <div class="panel panel--hero panel--on-yellow">
+          <div class="panel-body panel-body--compact">
+            <div class="hero-actions">
+              <a href="#" data-discord-link class="btn btn-hero-outline btn-mono" target="_blank" rel="noopener">
+                <svg width="16" height="16" fill="currentColor" aria-hidden="true"><use href="#icon-discord"/></svg>
+                Join Discord
+              </a>
+              <a href="https://github.com/murderszn/hermes-nora" class="btn btn-hero-outline btn-mono" target="_blank" rel="noopener">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                View source
+              </a>
+            </div>
+          </div>
         </div>
         <p class="hero-powered">POWERED BY <a href="https://nousresearch.com" target="_blank" rel="noopener">NOUS</a> · <a href="https://hermes-agent.nousresearch.com" target="_blank" rel="noopener">HERMES AGENT</a></p>
       </div>
@@ -105,7 +109,13 @@
         <h2 class="section-title">Deploy in one command</h2>
         <p class="section-desc">Clone from GitHub or run the installer. Works on macOS, Windows, and Linux.</p>
 
-        <div class="platform-grid" role="radiogroup" aria-label="Choose your platform">
+        <div class="panel panel--platforms">
+          <div class="panel-header">
+            <span class="panel-header-label">platform.select</span>
+            <span class="panel-header-meta">mac · win · linux</span>
+          </div>
+          <div class="panel-body panel-body--flush">
+        <div class="platform-grid platform-grid--rigid" role="radiogroup" aria-label="Choose your platform">
           <article class="platform-card active" data-platform="mac" role="radio" aria-checked="true" tabindex="0">
             <div class="platform-icon">
               <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
@@ -132,6 +142,8 @@
             <h3>Linux</h3>
             <span class="platform-select" aria-pressed="false">Select</span>
           </article>
+        </div>
+          </div>
         </div>
 
         <div class="terminal-block">
@@ -172,13 +184,18 @@
           </div>
         </div>
 
-        <div class="install-alt">
-          <p>Or clone directly with GitHub CLI:</p>
-          <div class="gh-command">
-            <code>gh repo clone murderszn/hermes-nora && cd hermes-nora && ./bootstrap.sh</code>
-            <button class="copy-btn copy-btn-sm" data-copy="gh repo clone murderszn/hermes-nora && cd hermes-nora && ./bootstrap.sh" aria-label="Copy command">
-              <span class="copy-text" aria-live="polite">Copy</span>
-            </button>
+        <div class="panel panel--gh">
+          <div class="panel-header">
+            <span class="panel-header-label">git.clone</span>
+            <span class="panel-header-meta">alternative</span>
+          </div>
+          <div class="panel-body panel-body--flush">
+            <div class="gh-command gh-command--embedded">
+              <code>gh repo clone murderszn/hermes-nora && cd hermes-nora && ./bootstrap.sh</code>
+              <button class="copy-btn copy-btn-sm" data-copy="gh repo clone murderszn/hermes-nora && cd hermes-nora && ./bootstrap.sh" aria-label="Copy command">
+                <span class="copy-text" aria-live="polite">Copy</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -190,7 +207,13 @@
         <h2 class="section-title section-title--channels">Reach her anywhere</h2>
         <p class="section-desc section-desc--channels">Hermes connects Nora to the apps you already use — chat, email, or terminal.</p>
 
-        <div class="channel-grid" role="list">
+        <div class="panel panel--channels">
+          <div class="panel-header">
+            <span class="panel-header-label">channel.gateway</span>
+            <span class="panel-header-meta">hermes supported</span>
+          </div>
+          <div class="panel-body panel-body--flush">
+        <div class="channel-grid channel-grid--rigid" role="list">
           <a href="#" data-discord-link class="channel-item channel-item--link" role="listitem" target="_blank" rel="noopener" aria-label="Join Nora on Discord">
             <svg class="channel-icon" width="22" height="22" aria-hidden="true"><use href="#icon-discord"/></svg>
             <span class="channel-name">Discord</span>
@@ -220,13 +243,14 @@
             <span class="channel-name">CLI</span>
           </div>
         </div>
-
-        <div class="channels-actions">
-          <a href="#" data-discord-link class="btn btn-discord btn-mono" target="_blank" rel="noopener">
-            <svg width="16" height="16" fill="currentColor" aria-hidden="true"><use href="#icon-discord"/></svg>
-            Join the community
-          </a>
-          <a href="docs.html#channels" class="btn btn-discord-ghost btn-mono">Setup guide →</a>
+          </div>
+          <div class="panel-footer">
+            <a href="#" data-discord-link class="btn btn-discord btn-mono" target="_blank" rel="noopener">
+              <svg width="16" height="16" fill="currentColor" aria-hidden="true"><use href="#icon-discord"/></svg>
+              Join the community
+            </a>
+            <a href="docs.html#channels" class="btn btn-discord-ghost btn-mono">Setup guide →</a>
+          </div>
         </div>
         <p class="channels-note">Talk to Nora on Discord once your server is wired up — or start with email. <a href="docs.html#channels">Channel docs →</a></p>
       </div>
@@ -241,6 +265,12 @@
         <p class="features-header-aside">A drop-in Hermes agent addon — persona, skills, and dashboards, built to live on your machine.</p>
       </div>
 
+      <div class="panel panel--features panel--on-yellow">
+        <div class="panel-header panel-header--yellow">
+          <span class="panel-header-label">capability.matrix</span>
+          <span class="panel-header-meta">6 modules</span>
+        </div>
+        <div class="panel-body panel-body--flush">
       <div class="feature-grid">
         <article class="feature-card reveal-on-scroll">
           <div class="feature-card-head">
@@ -302,10 +332,17 @@
           <p class="feature-desc">Pull it from GitHub, fork it, extend it. Built on Nous models and Hermes Agent — yours to deploy.</p>
         </article>
       </div>
+        </div>
+      </div>
     </section>
 
     <section class="cta reveal-on-scroll">
-      <div class="cta-inner">
+      <div class="cta-inner panel panel--cta">
+        <div class="panel-header">
+          <span class="panel-header-label">signal.status</span>
+          <span class="panel-header-meta panel-header-meta--live">listening</span>
+        </div>
+        <div class="panel-body panel-body--center">
         <h2>She's listening.</h2>
         <p class="cta-tagline">Deploy Nora on your machines. Open source. Ominously effective.</p>
         <div class="cta-actions">
@@ -315,11 +352,13 @@
             Join Discord
           </a>
         </div>
+        </div>
       </div>
     </section>
 
     <footer class="footer">
-      <div class="footer-inner">
+      <div class="footer-inner panel panel--footer">
+        <div class="panel-body panel-body--center">
         <span class="footer-brand">NORA</span>
         <div class="footer-links">
           <a href="docs.html">Docs</a>
@@ -330,6 +369,7 @@
           <a href="https://github.com/murderszn/hermes-nora/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a>
         </div>
         <p class="footer-copy">© 2026 Nora. Open source under MIT.</p>
+        </div>
       </div>
     </footer>
   </main>

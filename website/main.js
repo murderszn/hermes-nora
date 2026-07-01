@@ -97,9 +97,19 @@ function updateNavTheme() {
   }
 }
 
+function wireDiscordLinks() {
+  const invite = window.NORA_LINKS?.discord;
+  if (!invite) return;
+
+  document.querySelectorAll('[data-discord-link]').forEach((el) => {
+    el.href = invite;
+  });
+}
+
 function init() {
   document.documentElement.classList.add('js');
 
+  wireDiscordLinks();
   updateRevealHeight();
   nav.classList.add('nav--light');
   handleScroll();

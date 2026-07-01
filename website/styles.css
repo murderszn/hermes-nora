@@ -282,7 +282,8 @@ a {
   transition: color 0.2s;
 }
 
-.nav-gh {
+.nav-gh,
+.nav-discord {
   display: inline-flex;
   align-items: center;
   gap: 0.4375rem;
@@ -292,25 +293,30 @@ a {
   transition: border-color 0.2s, color 0.2s;
 }
 
-.nav--light .nav-gh {
+.nav--light .nav-gh,
+.nav--light .nav-discord {
   border-color: rgba(0, 0, 0, 0.22);
 }
 
-.nav--yellow .nav-gh {
+.nav--yellow .nav-gh,
+.nav--yellow .nav-discord {
   border-color: rgba(0, 0, 0, 0.22);
 }
 
-.nav-gh:hover {
+.nav-gh:hover,
+.nav-discord:hover {
   border-color: var(--yellow);
   color: var(--yellow) !important;
 }
 
-.nav--light .nav-gh:hover {
+.nav--light .nav-gh:hover,
+.nav--light .nav-discord:hover {
   border-color: var(--black);
   color: var(--black) !important;
 }
 
-.nav--yellow .nav-gh:hover {
+.nav--yellow .nav-gh:hover,
+.nav--yellow .nav-discord:hover {
   border-color: var(--black);
   color: var(--black) !important;
 }
@@ -528,6 +534,41 @@ a {
 
 .btn-primary:hover {
   background: var(--yellow-bright);
+}
+
+.btn-discord {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--yellow);
+  color: var(--text-on-yellow);
+  border: 1px solid var(--yellow);
+  border-radius: 2px;
+}
+
+.btn-discord:hover {
+  background: var(--yellow-bright);
+  border-color: var(--yellow-bright);
+}
+
+.btn-discord-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.875rem 1.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--gray-light);
+  border: 1px solid var(--border-dark);
+  border-radius: 2px;
+  background: transparent;
+  transition: border-color 0.2s, color 0.2s;
+}
+
+.btn-discord-ghost:hover {
+  border-color: rgba(255, 204, 0, 0.35);
+  color: var(--yellow);
 }
 
 .btn-lg {
@@ -859,9 +900,28 @@ a {
   transition: border-color 0.2s, background 0.2s;
 }
 
-.channel-item:hover {
+.channel-item:hover,
+.channel-item--link:hover {
   border-color: rgba(255, 204, 0, 0.32);
   background: var(--black-raised);
+}
+
+.channel-item--link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.channel-item--link:hover .channel-icon,
+.channel-item--link:hover .channel-name {
+  color: var(--yellow);
+}
+
+.channels-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
 }
 
 .channel-icon {
@@ -1050,6 +1110,14 @@ a {
   margin-bottom: 2.5rem;
 }
 
+.cta-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.875rem;
+}
+
 .cta .btn-mono {
   border-radius: 2px;
 }
@@ -1109,7 +1177,8 @@ a {
     gap: 1.25rem;
   }
 
-  .nav-gh {
+  .nav-gh,
+  .nav-discord {
     display: none;
   }
 

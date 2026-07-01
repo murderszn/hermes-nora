@@ -1043,7 +1043,7 @@ a {
   width: 100%;
   height: clamp(200px, 26vw, 360px);
   overflow: hidden;
-  background: var(--yellow-bright);
+  background: rgb(249, 174, 42);
 }
 
 .shader-banner-canvas {
@@ -1053,21 +1053,12 @@ a {
 }
 
 .shader-banner--fallback {
-  background:
-    repeating-linear-gradient(
-      0deg,
-      var(--yellow-bright) 0px,
-      var(--yellow-bright) 24px,
-      var(--yellow) 24px,
-      var(--yellow) 25px
-    ),
-    repeating-linear-gradient(
-      90deg,
-      var(--yellow-bright) 0px,
-      var(--yellow-bright) 24px,
-      var(--yellow) 24px,
-      var(--yellow) 25px
-    );
+  background-color: rgb(249, 174, 42);
+  background-image:
+    linear-gradient(var(--black) 18px, transparent 18px),
+    linear-gradient(90deg, var(--black) 18px, transparent 18px);
+  background-size: 28px 28px;
+  background-position: center;
 }
 
 .channels {

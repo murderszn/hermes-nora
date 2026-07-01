@@ -14,43 +14,33 @@ uniform float u_seed;
 uniform float u_scale;
 uniform float u_density;
 uniform float u_detail;
-uniform vec3 u_c0, u_c1, u_c2, u_c3;
-
-vec3 grad4(float t){
-  t = clamp(t, 0.0, 1.0);
-  vec3 c = mix(u_c0, u_c1, smoothstep(0.00, 0.55, t));
-  c = mix(c, u_c2, smoothstep(0.55, 0.82, t));
-  c = mix(c, u_c3, smoothstep(0.82, 1.00, t));
-  return c;
-}
+uniform vec3 u_yellow;
+uniform vec3 u_black;
 
 void main(){
-  vec2 uv = gl_FragCoord.xy / u_res;
-  uv.y = 1.0 - uv.y;
   float mn = sqrt(u_res.x * u_res.y);
   vec2 p = (gl_FragCoord.xy - 0.5 * u_res) / mn;
   p *= mix(1.0, 2.5, u_scale) * 3.0;
   p += vec2(fract(u_seed * 0.193), fract(u_seed * 0.317)) * 2.0;
+  p += vec2(cos(u_phase), sin(u_phase)) * 0.04;
 
-  float freq = 3.5 + u_density * 8.0;
-  float gx = sin(p.x * freq + u_phase);
-  float gy = sin(p.y * freq - u_phase);
-  float lines = max(gx, gy);
-  float nodes = gx * gy;
-  float f = 0.5 + 0.5 * mix(lines, nodes, 0.28);
+  float freq = 2.8 + u_density * 6.0;
+  vec2 gv = p * freq;
+  vec2 f = fract(gv);
 
-  float edge = 0.10 + u_detail * 0.06;
-  f = smoothstep(0.5 - edge, 0.5 + edge, f);
-  f = mix(0.62, 1.0, f);
+  float margin = 0.10 + u_detail * 0.04;
+  float inBox = step(margin, f.x) * step(f.x, 1.0 - margin)
+              * step(margin, f.y) * step(f.y, 1.0 - margin);
 
-  vec3 col = grad4(f);
+  vec3 col = mix(u_yellow, u_black, inBox);
   gl_FragColor = vec4(col, 1.0);
 }`;
 
   const PARAMS = {
     seed: 2251,
     loop: 48,
-    colors: ['#e09520', '#f9ae2a', '#fcc22e', '#fcd956'],
+    yellow: '#f9ae2a',
+    black: '#0a0908',
     scale: 0.55,
     density: 0.45,
     detail: 0.25,
@@ -118,10 +108,8 @@ void main(){
       u_scale: gl.getUniformLocation(prog, 'u_scale'),
       u_density: gl.getUniformLocation(prog, 'u_density'),
       u_detail: gl.getUniformLocation(prog, 'u_detail'),
-      u_c0: gl.getUniformLocation(prog, 'u_c0'),
-      u_c1: gl.getUniformLocation(prog, 'u_c1'),
-      u_c2: gl.getUniformLocation(prog, 'u_c2'),
-      u_c3: gl.getUniformLocation(prog, 'u_c3'),
+      u_yellow: gl.getUniformLocation(prog, 'u_yellow'),
+      u_black: gl.getUniformLocation(prog, 'u_black'),
     };
 
     let width = 0;
@@ -158,10 +146,8 @@ void main(){
       gl.uniform1f(U.u_scale, PARAMS.scale);
       gl.uniform1f(U.u_density, PARAMS.density);
       gl.uniform1f(U.u_detail, PARAMS.detail);
-      gl.uniform3fv(U.u_c0, hex2rgb(PARAMS.colors[0]));
-      gl.uniform3fv(U.u_c1, hex2rgb(PARAMS.colors[1]));
-      gl.uniform3fv(U.u_c2, hex2rgb(PARAMS.colors[2]));
-      gl.uniform3fv(U.u_c3, hex2rgb(PARAMS.colors[3]));
+      gl.uniform3fv(U.u_yellow, hex2rgb(PARAMS.yellow));
+      gl.uniform3fv(U.u_black, hex2rgb(PARAMS.black));
 
       gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
       rafId = requestAnimationFrame(draw);

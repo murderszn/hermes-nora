@@ -26,6 +26,7 @@
   --border-yellow: rgba(10, 9, 8, 0.12);
   --accent-line: rgba(255, 204, 0, 0.28);
   --font-display: 'Syne', system-ui, sans-serif;
+  --font-brand: 'Fraunces', Georgia, 'Times New Roman', serif;
   --font-body: 'Instrument Sans', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
   --nav-height: 72px;
@@ -220,7 +221,6 @@ a {
   display: flex;
   align-items: center;
   gap: 0.625rem;
-  font-family: var(--font-display);
   font-weight: 800;
   letter-spacing: 0.02em;
 }
@@ -246,7 +246,10 @@ a {
 }
 
 .nav-logo-text {
-  font-size: 1.1875rem;
+  font-family: var(--font-brand);
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
 }
 
 .nav-logo-sub {
@@ -343,11 +346,12 @@ a {
 .hero-title {
   position: relative;
   display: inline-block;
-  font-family: var(--font-display);
+  font-family: var(--font-brand);
   font-size: clamp(4.5rem, 11vw, 9.25rem);
   font-weight: 800;
-  line-height: 0.92;
-  letter-spacing: -0.02em;
+  font-optical-sizing: auto;
+  line-height: 0.95;
+  letter-spacing: -0.03em;
   margin-bottom: 1.75rem;
 }
 
@@ -1070,9 +1074,10 @@ a {
 }
 
 .footer-brand {
-  font-family: var(--font-display);
-  font-size: 1.25rem;
-  font-weight: 800;
+  font-family: var(--font-brand);
+  font-size: 1.3125rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
 }
 
 .footer-links {

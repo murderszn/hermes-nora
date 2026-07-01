@@ -18,9 +18,9 @@ uniform vec3 u_c0, u_c1, u_c2, u_c3;
 
 vec3 grad4(float t){
   t = clamp(t, 0.0, 1.0);
-  vec3 c = mix(u_c0, u_c1, smoothstep(0.00, 0.35, t));
-  c = mix(c, u_c2, smoothstep(0.35, 0.70, t));
-  c = mix(c, u_c3, smoothstep(0.70, 1.00, t));
+  vec3 c = mix(u_c0, u_c1, smoothstep(0.00, 0.55, t));
+  c = mix(c, u_c2, smoothstep(0.55, 0.82, t));
+  c = mix(c, u_c3, smoothstep(0.82, 1.00, t));
   return c;
 }
 
@@ -41,6 +41,7 @@ void main(){
 
   float edge = 0.10 + u_detail * 0.06;
   f = smoothstep(0.5 - edge, 0.5 + edge, f);
+  f = mix(0.62, 1.0, f);
 
   vec3 col = grad4(f);
   gl_FragColor = vec4(col, 1.0);
@@ -49,7 +50,7 @@ void main(){
   const PARAMS = {
     seed: 2251,
     loop: 48,
-    colors: ['#0a0908', '#f9ae2a', '#fcc22e', '#000000'],
+    colors: ['#e09520', '#f9ae2a', '#fcc22e', '#fcd956'],
     scale: 0.55,
     density: 0.45,
     detail: 0.25,

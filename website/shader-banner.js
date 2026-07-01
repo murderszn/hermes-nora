@@ -14,48 +14,7 @@ uniform float u_seed;
 uniform float u_scale;
 uniform float u_density;
 uniform float u_detail;
-uniform float u_grain;
 uniform vec3 u_c0, u_c1, u_c2, u_c3;
-
-float hash21(vec2 p){
-  p = fract(p * vec2(234.34, 435.345));
-  p += dot(p, p + 34.23);
-  return fract(p.x * p.y);
-}
-
-vec2 fade(vec2 t) { return t*t*t*(t*(t*6.0-15.0)+10.0); }
-
-vec4 permute(vec4 x) { return mod(((x*34.0)+1.0)*x, 289.0); }
-
-float cnoise(vec2 P) {
-  vec4 Pi = floor(P.xyxy) + vec4(0.0, 0.0, 1.0, 1.0);
-  vec4 Pf = fract(P.xyxy) - vec4(0.0, 0.0, 1.0, 1.0);
-  Pi = mod(Pi, 289.0);
-  vec4 ix = Pi.xzxz; vec4 iy = Pi.yyww;
-  vec4 fx = Pf.xzxz; vec4 fy = Pf.yyww;
-  vec4 i = permute(permute(ix) + iy);
-  vec4 gx = fract(i * (1.0 / 41.0)) * 2.0 - 1.0;
-  vec4 gy = abs(gx) - 0.5;
-  vec4 tx = floor(gx + 0.5);
-  gx = gx - tx;
-  vec2 g00 = vec2(gx.x,gy.x);
-  vec2 g10 = vec2(gx.y,gy.y);
-  vec2 g01 = vec2(gx.z,gy.z);
-  vec2 g11 = vec2(gx.w,gy.w);
-  vec4 norm = 1.79284291400159 - 0.85373472095314 * vec4(dot(g00, g00), dot(g01, g01), dot(g10, g10), dot(g11, g11));
-  g00 *= norm.x; g01 *= norm.y; g10 *= norm.z; g11 *= norm.w;
-  float n00 = dot(g00, vec2(fx.x, fy.x));
-  float n10 = dot(g10, vec2(fx.y, fy.y));
-  float n01 = dot(g01, vec2(fx.z, fy.z));
-  float n11 = dot(g11, vec2(fx.w, fy.w));
-  vec2 fade_xy = fade(Pf.xy);
-  vec2 n_x = mix(vec2(n00, n01), vec2(n10, n11), fade_xy.x);
-  return 2.3 * mix(n_x.x, n_x.y, fade_xy.y);
-}
-
-vec2 loopOff(){
-  return vec2(cos(u_phase), sin(u_phase)) * 0.10;
-}
 
 vec3 grad4(float t){
   t = clamp(t, 0.0, 1.0);
@@ -68,40 +27,32 @@ vec3 grad4(float t){
 void main(){
   vec2 uv = gl_FragCoord.xy / u_res;
   uv.y = 1.0 - uv.y;
-  float ar = u_res.x / u_res.y;
-  vec2 sOff = vec2(fract(u_seed * 0.193), fract(u_seed * 0.317)) * 47.0;
+  float mn = sqrt(u_res.x * u_res.y);
+  vec2 p = (gl_FragCoord.xy - 0.5 * u_res) / mn;
+  p *= mix(1.0, 2.5, u_scale) * 3.0;
+  p += vec2(fract(u_seed * 0.193), fract(u_seed * 0.317)) * 2.0;
 
-  vec2 p = (uv - 0.5) * vec2(ar, 1.0) * mix(2.0, 6.0, u_scale) + sOff;
-  mat2 rot = mat2(0.8, 0.6, -0.6, 0.8);
-  float v = 0.0;
-  float a = 0.5;
-  vec2 q2 = p + loopOff();
-  for (int i = 0; i < 8; i++){
-    float fi = float(i);
-    if (fi >= mix(3.0, 8.0, u_density)) break;
-    v += a * abs(cnoise(q2 + loopOff()));
-    q2 = rot * q2 * 2.0 + vec2(100.0);
-    a *= mix(0.35, 0.65, u_detail);
-  }
+  float freq = 3.5 + u_density * 8.0;
+  float gx = sin(p.x * freq + u_phase);
+  float gy = sin(p.y * freq - u_phase);
+  float lines = max(gx, gy);
+  float nodes = gx * gy;
+  float f = 0.5 + 0.5 * mix(lines, nodes, 0.28);
 
-  vec3 col = grad4(clamp(v, 0.0, 1.0));
-  col += u_c3 * pow(clamp(v, 0.0, 1.0), 3.0) * 0.2;
-  col += (hash21(gl_FragCoord.xy + loopOff() * 91.3) - 0.5) * u_grain * 0.22;
+  float edge = 0.10 + u_detail * 0.06;
+  f = smoothstep(0.5 - edge, 0.5 + edge, f);
 
-  vec2 vig = uv * 2.0 - 1.0;
-  col *= 1.0 - dot(vig, vig) * 0.16;
-
+  vec3 col = grad4(f);
   gl_FragColor = vec4(col, 1.0);
 }`;
 
   const PARAMS = {
     seed: 2251,
-    loop: 6,
+    loop: 48,
     colors: ['#0a0908', '#f9ae2a', '#fcc22e', '#000000'],
-    scale: 0.6908631857900177,
-    density: 0.594701655989847,
-    detail: 0.7742052745347444,
-    grain: 0.35,
+    scale: 0.55,
+    density: 0.45,
+    detail: 0.25,
   };
 
   function hex2rgb(h) {
@@ -166,7 +117,6 @@ void main(){
       u_scale: gl.getUniformLocation(prog, 'u_scale'),
       u_density: gl.getUniformLocation(prog, 'u_density'),
       u_detail: gl.getUniformLocation(prog, 'u_detail'),
-      u_grain: gl.getUniformLocation(prog, 'u_grain'),
       u_c0: gl.getUniformLocation(prog, 'u_c0'),
       u_c1: gl.getUniformLocation(prog, 'u_c1'),
       u_c2: gl.getUniformLocation(prog, 'u_c2'),
@@ -198,7 +148,7 @@ void main(){
 
       const elapsed = (now - t0) / 1000;
       const phase = prefersReducedMotion
-        ? 1.2
+        ? 0.0
         : (elapsed / PARAMS.loop * Math.PI * 2) % (Math.PI * 2);
 
       gl.uniform2f(U.u_res, width, height);
@@ -207,7 +157,6 @@ void main(){
       gl.uniform1f(U.u_scale, PARAMS.scale);
       gl.uniform1f(U.u_density, PARAMS.density);
       gl.uniform1f(U.u_detail, PARAMS.detail);
-      gl.uniform1f(U.u_grain, PARAMS.grain);
       gl.uniform3fv(U.u_c0, hex2rgb(PARAMS.colors[0]));
       gl.uniform3fv(U.u_c1, hex2rgb(PARAMS.colors[1]));
       gl.uniform3fv(U.u_c2, hex2rgb(PARAMS.colors[2]));

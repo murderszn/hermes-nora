@@ -371,7 +371,8 @@ a {
 
 .hero-actions {
   display: flex;
-  flex-wrap: wrap;
+  flex-flow: row nowrap;
+  align-items: center;
   gap: 1rem;
   margin-bottom: 2rem;
 }
@@ -1209,7 +1210,9 @@ a {
   display: grid;
   grid-template-columns: 1fr;
   gap: 3rem;
-  margin-top: clamp(3.5rem, 8vw, 5.5rem);
+  max-width: var(--page-max);
+  width: 100%;
+  margin: clamp(3.5rem, 8vw, 5.5rem) auto 0;
   padding-top: clamp(3rem, 6vw, 4.5rem);
   border-top: 1px solid var(--border-yellow);
 }

@@ -1363,6 +1363,15 @@ a {
   flex-shrink: 0;
   width: 28px;
   height: 28px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.feature-card:hover .feature-icon {
+  color: rgba(10, 9, 8, 0.62);
 }
 
 .feature-tag {

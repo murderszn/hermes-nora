@@ -13,40 +13,38 @@ uniform float u_time;
 uniform float u_seed;
 uniform float u_scale;
 uniform float u_density;
-uniform float u_detail;
 uniform vec3 u_yellow;
 uniform vec3 u_black;
 
 void main(){
   float mn = sqrt(u_res.x * u_res.y);
   vec2 p = (gl_FragCoord.xy - 0.5 * u_res) / mn;
-  p *= mix(1.0, 2.5, u_scale) * 3.0;
+  p *= mix(1.2, 2.6, u_scale) * 3.0;
   p += vec2(fract(u_seed * 0.193), fract(u_seed * 0.317)) * 2.0;
-  p += vec2(sin(u_time * 0.11), cos(u_time * 0.14)) * 0.05;
 
-  float freq = 2.8 + u_density * 6.0;
-  vec2 gv = p * freq;
+  float tick = floor(u_time * 1.0);
+  float freq = 5.0 + u_density * 7.0;
+
+  vec2 stepOffset = vec2(mod(tick, 7.0), mod(floor(tick * 0.37), 5.0)) / freq;
+  vec2 gv = (p + stepOffset) * freq;
   vec2 id = floor(gv);
   vec2 f = fract(gv);
 
-  float rowWave = sin(u_time * 0.38 + id.y * 0.785398);
-  float colWave = sin(u_time * 0.51 + id.x * 1.047198);
-  float cellWave = sin(u_time * 0.29 + dot(id, vec2(0.513, 0.877)));
-  float cellWaveB = cos(u_time * 0.44 + id.x * 0.619 - id.y * 0.431);
+  float gutter = 0.055;
+  float inBox = step(gutter, f.x) * step(f.x, 1.0 - gutter)
+              * step(gutter, f.y) * step(f.y, 1.0 - gutter);
 
-  vec2 drift = vec2(
-    rowWave * 0.09 + cellWave * 0.05,
-    colWave * 0.09 + cellWaveB * 0.05
-  );
-  f = fract(f + drift);
+  float cx = mod(tick, 11.0);
+  float cy = mod(floor(tick / 11.0), 7.0);
+  float cursorBlink = 1.0 - step(0.5, mod(tick, 2.0));
+  float isCursor = cursorBlink * step(abs(id.x - cx), 0.5) * step(abs(id.y - cy), 0.5);
 
-  float margin = 0.10 + u_detail * 0.04;
-  margin += sin(u_time * 0.62 + id.x * 0.41 + id.y * 0.67) * 0.016;
+  float scanRow = step(abs(id.y - mod(tick, 6.0)), 0.5);
+  float scanBit = step(mod(id.x + tick, 2.0), 1.0);
+  float scanPulse = scanRow * scanBit;
 
-  float inBox = step(margin, f.x) * step(f.x, 1.0 - margin)
-              * step(margin, f.y) * step(f.y, 1.0 - margin);
-
-  vec3 col = mix(u_yellow, u_black, inBox);
+  float fill = inBox * (1.0 - max(isCursor, scanPulse * 0.4));
+  vec3 col = mix(u_yellow, u_black, fill);
   gl_FragColor = vec4(col, 1.0);
 }`;
 
@@ -54,9 +52,8 @@ void main(){
     seed: 2251,
     yellow: '#f9ae2a',
     black: '#0a0908',
-    scale: 0.55,
-    density: 0.45,
-    detail: 0.25,
+    scale: 0.5,
+    density: 0.55,
   };
 
   function hex2rgb(h) {
@@ -120,7 +117,6 @@ void main(){
       u_seed: gl.getUniformLocation(prog, 'u_seed'),
       u_scale: gl.getUniformLocation(prog, 'u_scale'),
       u_density: gl.getUniformLocation(prog, 'u_density'),
-      u_detail: gl.getUniformLocation(prog, 'u_detail'),
       u_yellow: gl.getUniformLocation(prog, 'u_yellow'),
       u_black: gl.getUniformLocation(prog, 'u_black'),
     };
@@ -155,7 +151,6 @@ void main(){
       gl.uniform1f(U.u_seed, (PARAMS.seed % 10000) * 0.6180339887 % 12.566);
       gl.uniform1f(U.u_scale, PARAMS.scale);
       gl.uniform1f(U.u_density, PARAMS.density);
-      gl.uniform1f(U.u_detail, PARAMS.detail);
       gl.uniform3fv(U.u_yellow, hex2rgb(PARAMS.yellow));
       gl.uniform3fv(U.u_black, hex2rgb(PARAMS.black));
 

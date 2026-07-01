@@ -1055,10 +1055,10 @@ a {
 .shader-banner--fallback {
   background-color: rgb(249, 174, 42);
   background-image:
-    linear-gradient(var(--black) 18px, transparent 18px),
-    linear-gradient(90deg, var(--black) 18px, transparent 18px);
-  background-size: 28px 28px;
-  background-position: center;
+    linear-gradient(var(--black) 20px, transparent 20px),
+    linear-gradient(90deg, var(--black) 20px, transparent 20px);
+  background-size: 24px 24px;
+  background-position: 0 0;
 }
 
 .channels {

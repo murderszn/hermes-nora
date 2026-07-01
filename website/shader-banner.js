@@ -16,34 +16,66 @@ uniform float u_density;
 uniform vec3 u_yellow;
 uniform vec3 u_black;
 
+float hash21(vec2 p){
+  p = fract(p * vec2(234.34, 435.345));
+  p += dot(p, p + 34.23);
+  return fract(p.x * p.y);
+}
+
+float nearHead(float order, float head){
+  return 1.0 - step(2.0, abs(order - head));
+}
+
 void main(){
   float mn = sqrt(u_res.x * u_res.y);
   vec2 p = (gl_FragCoord.xy - 0.5 * u_res) / mn;
   p *= mix(1.2, 2.6, u_scale) * 3.0;
   p += vec2(fract(u_seed * 0.193), fract(u_seed * 0.317)) * 2.0;
 
-  float tick = floor(u_time * 1.0);
+  float tick = floor(u_time * 1.6);
   float freq = 5.0 + u_density * 7.0;
-
-  vec2 stepOffset = vec2(mod(tick, 7.0), mod(floor(tick * 0.37), 5.0)) / freq;
-  vec2 gv = (p + stepOffset) * freq;
+  vec2 gv = p * freq;
   vec2 id = floor(gv);
   vec2 f = fract(gv);
 
-  float gutter = 0.055;
+  float gutter = 0.05;
   float inBox = step(gutter, f.x) * step(f.x, 1.0 - gutter)
               * step(gutter, f.y) * step(f.y, 1.0 - gutter);
 
-  float cx = mod(tick, 11.0);
-  float cy = mod(floor(tick / 11.0), 7.0);
-  float cursorBlink = 1.0 - step(0.5, mod(tick, 2.0));
-  float isCursor = cursorBlink * step(abs(id.x - cx), 0.5) * step(abs(id.y - cy), 0.5);
+  float chunkRoll = hash21(id);
+  vec2 cluster2 = floor(id / 2.0);
+  vec2 cluster3 = floor(id / 3.0);
+  vec2 clusterCoord = mix(cluster2, cluster3, step(0.58, chunkRoll));
 
-  float scanRow = step(abs(id.y - mod(tick, 6.0)), 0.5);
-  float scanBit = step(mod(id.x + tick, 2.0), 1.0);
-  float scanPulse = scanRow * scanBit;
+  float clusterOrder = hash21(clusterCoord * 1.91 + vec2(u_seed * 0.13)) * 88.0;
+  float progress = tick * 1.35;
+  float addressed = step(clusterOrder, progress);
 
-  float fill = inBox * (1.0 - max(isCursor, scanPulse * 0.4));
+  float head0 = mod(tick * 1.9 + u_seed * 3.7, 88.0);
+  float head1 = mod(tick * 2.7 + u_seed * 1.4, 88.0);
+  float head2 = mod(tick * 1.3 + u_seed * 5.1, 88.0);
+  float head3 = mod(tick * 3.1 + u_seed * 2.8, 88.0);
+
+  float clusterActive = 0.0;
+  clusterActive = max(clusterActive, nearHead(clusterOrder, head0));
+  clusterActive = max(clusterActive, nearHead(clusterOrder, head1));
+  clusterActive = max(clusterActive, nearHead(clusterOrder, head2));
+  clusterActive = max(clusterActive, nearHead(clusterOrder, head3));
+
+  float pulse = 1.0 - step(0.5, mod(tick, 2.0));
+  clusterActive *= pulse;
+
+  float cellOrder = hash21(id + vec2(u_seed * 0.29)) * 160.0;
+  float sparkHead = mod(tick * 4.3 + u_seed * 7.2, 160.0);
+  float cellSpark = nearHead(cellOrder, sparkHead) * pulse;
+  float cellDone = step(cellOrder, tick * 2.2);
+
+  float highlighted = clamp(
+    max(addressed, clusterActive * 0.95) + max(cellSpark, cellDone) * 0.85,
+    0.0, 1.0
+  );
+
+  float fill = inBox * (1.0 - highlighted);
   vec3 col = mix(u_yellow, u_black, fill);
   gl_FragColor = vec4(col, 1.0);
 }`;

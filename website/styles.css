@@ -762,14 +762,6 @@ a {
   color: var(--text-on-yellow-subtle);
 }
 
-.panel--hero {
-  margin-bottom: 2rem;
-}
-
-.panel--hero.panel--on-yellow .panel-body {
-  background: rgba(10, 9, 8, 0.03);
-}
-
 .panel--footer {
   max-width: var(--page-max);
   width: 100%;

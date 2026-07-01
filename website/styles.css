@@ -26,7 +26,7 @@
   --border-yellow: rgba(10, 9, 8, 0.12);
   --accent-line: rgba(255, 204, 0, 0.28);
   --font-display: 'Syne', system-ui, sans-serif;
-  --font-brand: 'Fraunces', Georgia, 'Times New Roman', serif;
+  --font-brand: 'Outfit', system-ui, sans-serif;
   --font-body: 'Instrument Sans', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
   --nav-height: 72px;
@@ -247,9 +247,9 @@ a {
 
 .nav-logo-text {
   font-family: var(--font-brand);
-  font-size: 1.25rem;
-  font-weight: 700;
-  letter-spacing: -0.01em;
+  font-size: 1.1875rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
 }
 
 .nav-logo-sub {
@@ -349,9 +349,8 @@ a {
   font-family: var(--font-brand);
   font-size: clamp(4.5rem, 11vw, 9.25rem);
   font-weight: 800;
-  font-optical-sizing: auto;
-  line-height: 0.95;
-  letter-spacing: -0.03em;
+  line-height: 0.92;
+  letter-spacing: -0.02em;
   margin-bottom: 1.75rem;
 }
 
@@ -1075,9 +1074,9 @@ a {
 
 .footer-brand {
   font-family: var(--font-brand);
-  font-size: 1.3125rem;
-  font-weight: 700;
-  letter-spacing: -0.01em;
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
 }
 
 .footer-links {

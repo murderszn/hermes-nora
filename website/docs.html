@@ -68,9 +68,9 @@
       <h1 class="docs-title">The technology behind Nora</h1>
       <p class="docs-lead">
         Nora is not a new AI model. She is a persona, a dashboard, and a set of practices
-        built on top of <a href="https://hermes-agent.nousresearch.com" target="_blank" rel="noopener">Hermes Agent</a> —
-        giving you an always-on, locally rooted assistant you can reach from your computer
-        or your phone.
+        built on <a href="https://hermes-agent.nousresearch.com" target="_blank" rel="noopener">Hermes Agent</a> with
+        <a href="https://enter.pollinations.ai" target="_blank" rel="noopener">Pollinations AI</a> as the default brain —
+        an always-on, locally rooted assistant you can reach from your computer or your phone.
       </p>
       <div class="docs-hero-links">
         <a href="index.html#install" class="btn btn-hero-primary btn-mono">./install-nora</a>
@@ -84,6 +84,7 @@
       <p class="docs-toc-label">On this page</p>
       <nav>
         <a href="#getting-started">Getting started</a>
+        <a href="#pollinations">Pollinations AI</a>
         <a href="#prerequisites">Prerequisites</a>
         <a href="#install-guides">Install guides</a>
         <a href="#phone">Your phone</a>
@@ -125,7 +126,7 @@
             <span class="docs-path-num" aria-hidden="true"></span>
             <div class="docs-path-body">
               <h3>Install Nora</h3>
-              <p>Pull the persona addon from <a href="index.html#install">the home page install section</a> or run the one-line script.</p>
+              <p>Pull the persona addon from <a href="index.html#install">the home page</a>, then run <code class="docs-inline-code">./scripts/onboard.sh</code> — wizard for Pollinations key, persona, and your first channel.</p>
             </div>
           </li>
           <li>
@@ -160,6 +161,32 @@
             <li>You can reach her from your phone using that same channel</li>
           </ul>
         </div>
+      </section>
+
+      <section id="pollinations" class="docs-section">
+        <h2>Pollinations AI — Nora's default brain</h2>
+        <p>
+          Nora ships with <strong>Pollinations</strong> as the default LLM so new users need one API key, not five.
+          The onboard wizard writes <code class="docs-inline-code">POLLINATIONS_API_KEY</code> into your local
+          <code class="docs-inline-code">.env</code> and activates Hermes with <code class="docs-inline-code">custom:pollinations</code>.
+        </p>
+
+        <div class="docs-card-grid">
+          <div class="docs-card">
+            <h3>Get a key</h3>
+            <p>Sign in at <a href="https://enter.pollinations.ai" target="_blank" rel="noopener">enter.pollinations.ai</a> (GitHub works). Copy your API key into <code class="docs-inline-code">nora/.env</code> or let <code class="docs-inline-code">onboard.sh</code> prompt you.</p>
+          </div>
+          <div class="docs-card">
+            <h3>Default model</h3>
+            <p><code class="docs-inline-code">kimi</code> — 256K context, tools, and vision on one endpoint. Fallbacks: <code class="docs-inline-code">deepseek</code>, <code class="docs-inline-code">glm</code>.</p>
+          </div>
+          <div class="docs-card">
+            <h3>Switch in chat</h3>
+            <p><code class="docs-inline-code">/model custom:pollinations:claude-fast</code> or other Pollinations models. Hermes-existing users: <code class="docs-inline-code">activate.sh --merge-only</code> keeps your provider.</p>
+          </div>
+        </div>
+
+        <p>API reference: <a href="https://gen.pollinations.ai/docs" target="_blank" rel="noopener">gen.pollinations.ai/docs</a>. Roadmap for the full tool harness: <a href="roadmap.html#harness">Nora harness &amp; SDK →</a></p>
       </section>
 
       <section id="prerequisites" class="docs-section">
@@ -200,7 +227,7 @@
             </tr>
             <tr>
               <td>API key</td>
-              <td>A model provider key (Nous / your chosen LLM) — Hermes walks you through this on first launch</td>
+              <td><a href="#pollinations">Pollinations API key</a> (Nora default) — or your own LLM with <code class="docs-inline-code">--merge-only</code></td>
               <td>—</td>
             </tr>
           </tbody>
@@ -515,10 +542,11 @@ pip3 --version</code>
             <tr><th>Tool</th><th>Role</th></tr>
           </thead>
           <tbody>
+            <tr><td>Pollinations AI</td><td>Default brain — kimi, tools, vision (<a href="#pollinations">setup</a>)</td></tr>
             <tr><td>Hermes tools</td><td>Terminal, browser, scheduling, memory, subagents</td></tr>
-            <tr><td>Playwright</td><td>Browser automation when you need a real page</td></tr>
-            <tr><td>Beautiful Soup</td><td>Parse HTML for scraping and monitoring</td></tr>
-            <tr><td>Google APIs</td><td>Gmail, Drive, Calendar</td></tr>
+            <tr><td>Browser / computer use</td><td>agent-browser, Playwright — see <a href="roadmap.html#tools">roadmap</a></td></tr>
+            <tr><td>MCP</td><td>Model Context Protocol servers via Hermes + Nora skill packs</td></tr>
+            <tr><td>Nora CLI harness</td><td><code class="docs-inline-code">onboard.sh</code>, <code class="docs-inline-code">doctor.sh</code>, <code class="docs-inline-code">activate.sh</code></td></tr>
             <tr><td>Discord / Slack / Telegram</td><td>Where you — and your phone — talk to Nora</td></tr>
           </tbody>
         </table>

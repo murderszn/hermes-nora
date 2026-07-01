@@ -6,7 +6,7 @@
 
 ![Repo size](https://img.shields.io/github/repo-size/murderszn/Hermes-Nora)
 ![Last commit](https://img.shields.io/github/last-commit/murderszn/Hermes-Nora)
-![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![GitHub Pages](https://img.shields.io/badge/docs-GitHub%20Pages-ffcc00)](https://murderszn.github.io/hermes-nora/)
 
 **Nora** is a charming, always-on [Hermes Agent](https://hermes-agent.nousresearch.com/) persona with local machine access, a control dashboard, and ops skills. Talk to her from Discord, Gmail, or your phone — she runs on your computer and does the work.
@@ -126,6 +126,14 @@ Panel rows are 50/50 width splits. Inner lists scroll independently.
 ## Learnings
 
 See [`learnings/2026-06-27-diagnostics-and-learnings.md`](learnings/2026-06-27-diagnostics-and-learnings.md) for diagnostics, proposed skills, and correction items.
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
+
+You are free to use, copy, modify, merge, publish, distribute, sublicense, and sell copies of this software, provided the copyright notice and permission notice are included in all copies or substantial portions. See [LICENSE](LICENSE) for the full text.
+
+Copyright (c) 2026 murderszn
 
 ## Links
 

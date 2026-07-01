@@ -1,0 +1,16 @@
+# Discord behavior for Nora — merged by scripts/activate.sh
+#
+# Duplicate threads happen when BOTH are true:
+#   1. You manually "Create Thread" on your message (you = creator)
+#   2. Hermes auto_thread creates its own thread on @mention (bot = creator)
+#
+# Pick ONE workflow (see persona/hermes-setup.md):
+#   A) auto_thread: true  — @mention in channel only; let Nora create the thread
+#   B) auto_thread: false — you create the thread; @mention Nora inside it only
+
+discord:
+  require_mention: true
+  auto_thread: false
+  thread_require_mention: false
+  reactions: true
+  history_backfill: true

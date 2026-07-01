@@ -1,0 +1,30 @@
+# Nora default LLM — Pollinations.ai (OpenAI-compatible)
+# Applied by scripts/activate.sh into ~/.hermes/config.yaml
+# API key: POLLINATIONS_API_KEY in nora/.env → synced to ~/.hermes/.env
+# Get key: https://enter.pollinations.ai (GitHub: murderszn)
+
+custom_providers:
+  - name: pollinations
+    base_url: https://gen.pollinations.ai/v1
+    key_env: POLLINATIONS_API_KEY
+    models:
+      kimi:
+        context_length: 256000
+        supports_vision: true
+      deepseek:
+        context_length: 1000000
+      glm:
+        context_length: 128000
+      claude-fast:
+        context_length: 200000
+        supports_vision: true
+
+model:
+  default: kimi
+  provider: custom:pollinations
+
+fallback_providers:
+  - provider: custom:pollinations
+    model: deepseek
+  - provider: custom:pollinations
+    model: glm

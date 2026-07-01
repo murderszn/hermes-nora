@@ -29,4 +29,12 @@ if (Test-Path $Bootstrap) {
 }
 
 Write-Host ""
-Write-Host "  Nora is ready." -ForegroundColor Yellow
+Write-Host "  Nora files are in $InstallDir" -ForegroundColor Yellow
+Write-Host ""
+Write-Host "  Next - run the onboarding wizard:"
+Write-Host "    $InstallDir\scripts\onboard.ps1"
+Write-Host ""
+Write-Host "  Or activate only:"
+Write-Host "    $InstallDir\scripts\activate.ps1"
+Write-Host ""
+Write-Host "  Docs: $InstallDir\persona\channels.md"

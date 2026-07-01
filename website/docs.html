@@ -384,19 +384,33 @@ pip3 --version</code>
           Pick <strong>one channel to start</strong>. Get it working end-to-end before you add more.
         </p>
 
+        <div class="docs-card-grid">
+          <div class="docs-card">
+            <h3>Onboard wizard</h3>
+            <p>After install, run the setup wizard — persona, secrets, activate, gateway, verify.</p>
+            <code class="docs-code">~/.nora/scripts/onboard.sh</code>
+            <p class="docs-note">Windows: <code class="docs-inline-code">onboard.ps1</code> · Health check: <code class="docs-inline-code">doctor.sh</code></p>
+          </div>
+          <div class="docs-card">
+            <h3>Channel hub</h3>
+            <p>Hermes doc link + Nora <code class="docs-inline-code">.env</code> template for every platform — Discord, Telegram, Slack, email, Teams, and more.</p>
+            <p>See <code class="docs-inline-code">persona/channels.md</code> in your Nora install.</p>
+          </div>
+        </div>
+
         <div class="docs-guide">
           <div class="docs-guide-header">
             <h3>Discord (recommended first)</h3>
             <span class="docs-guide-tag">Chat</span>
           </div>
           <div class="docs-guide-body">
+            <p>Canonical setup: <a href="https://hermes-agent.nousresearch.com/docs/user-guide/messaging/discord" target="_blank" rel="noopener">Hermes Discord guide</a>. Nora template: <code class="docs-inline-code">env.discord.example</code>.</p>
             <ol class="docs-steps">
-              <li>Create a Discord server (or use an existing one) where Nora will live.</li>
-              <li>In the <a href="https://discord.com/developers/applications" target="_blank" rel="noopener">Discord Developer Portal</a>, create an application and bot. Copy the bot token.</li>
-              <li>In Hermes settings, add the Discord gateway and paste your token. Enable the intents Hermes requests.</li>
-              <li>Invite the bot to your server with message permissions.</li>
-              <li>Send <code class="docs-inline-code">hello</code> in a channel. Nora should reply.</li>
-              <li>Open Discord on your phone and repeat — same conversation, same agent.</li>
+              <li>Run <code class="docs-inline-code">./scripts/onboard.sh</code> or create a bot in the <a href="https://discord.com/developers/applications" target="_blank" rel="noopener">Discord Developer Portal</a> and copy the token into <code class="docs-inline-code">.env</code>.</li>
+              <li>Run <code class="docs-inline-code">./scripts/activate.sh</code> — wires SOUL, skills, and <code class="docs-inline-code">auto_thread: false</code> (no duplicate bot threads).</li>
+              <li>Start the gateway: <code class="docs-inline-code">hermes gateway install</code> or <code class="docs-inline-code">hermes gateway run</code>.</li>
+              <li><strong>You</strong> create a thread on your message, then @mention Nora <strong>inside that thread</strong> — not in the parent channel.</li>
+              <li>Open Discord on your phone — same conversation, same agent.</li>
             </ol>
           </div>
         </div>
@@ -407,12 +421,13 @@ pip3 --version</code>
             <span class="docs-guide-tag">Email</span>
           </div>
           <div class="docs-guide-body">
+            <p>Canonical setup: <a href="https://hermes-agent.nousresearch.com/docs/user-guide/messaging/email" target="_blank" rel="noopener">Hermes Email guide</a>. Nora template: <code class="docs-inline-code">env.email.example</code>.</p>
             <ol class="docs-steps">
               <li>Create a dedicated Gmail account for Nora (e.g. <code class="docs-inline-code">nora.yourname@gmail.com</code>).</li>
-              <li>In <a href="https://console.cloud.google.com" target="_blank" rel="noopener">Google Cloud Console</a>, create a project and enable the Gmail API.</li>
-              <li>Create OAuth credentials or a service account — Hermes docs cover the exact flow for your setup.</li>
-              <li>Connect the inbox in Hermes. Send a test email from your personal account.</li>
-              <li>Nora replies. You can continue the thread from Gmail on your phone.</li>
+              <li>Use an App Password (Gmail) or follow Hermes for OAuth — see the Hermes email doc.</li>
+              <li>Add credentials to <code class="docs-inline-code">.env</code> via onboard or <code class="docs-inline-code">env.email.example</code>, then <code class="docs-inline-code">./scripts/activate.sh</code>.</li>
+              <li>Send a test email from your personal account. Nora replies on the gateway.</li>
+              <li>Continue the thread from Gmail on your phone.</li>
             </ol>
             <p class="docs-note">
               Email is slower than chat but better for project handoffs, newsletters, and anything you want an audit trail for.

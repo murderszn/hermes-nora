@@ -29,4 +29,12 @@ else
 fi
 
 echo ""
-echo "  Nora is ready."
+echo "  Nora files are in $INSTALL_DIR"
+echo ""
+echo "  Next — run the onboarding wizard:"
+echo "    $INSTALL_DIR/scripts/onboard.sh"
+echo ""
+echo "  Or macOS/Linux activate only:"
+echo "    $INSTALL_DIR/scripts/activate.sh"
+echo ""
+echo "  Docs: $INSTALL_DIR/persona/channels.md"

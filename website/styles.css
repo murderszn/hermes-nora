@@ -1491,25 +1491,52 @@ a {
   }
 
   .overlay-bg {
-    background-position: 62% center;
+    background-position: 88% center;
   }
 
   .overlay-bg::after {
-    background: linear-gradient(
-      115deg,
-      rgba(255, 204, 0, 0.92) 0%,
-      rgba(255, 204, 0, 0.62) 34%,
-      rgba(10, 9, 8, 0.35) 62%,
-      rgba(10, 9, 8, 0.15) 100%
-    );
+    background:
+      linear-gradient(
+        90deg,
+        rgba(255, 204, 0, 1) 0%,
+        rgba(255, 204, 0, 0.97) 38%,
+        rgba(255, 204, 0, 0.72) 52%,
+        rgba(255, 204, 0, 0.18) 68%,
+        transparent 82%
+      ),
+      linear-gradient(
+        180deg,
+        rgba(255, 204, 0, 0.35) 0%,
+        transparent 42%,
+        rgba(10, 9, 8, 0.12) 100%
+      );
   }
 
   .hero-content {
+    position: relative;
+    isolation: isolate;
     max-width: 100%;
     padding: calc(var(--nav-height) + 1.75rem) 1.5rem 4.75rem;
     padding-left: max(1.5rem, env(safe-area-inset-left));
     padding-right: max(1.5rem, env(safe-area-inset-right));
-    color: var(--white);
+    color: var(--black);
+  }
+
+  .hero-content::before {
+    content: '';
+    position: absolute;
+    top: -1.25rem;
+    left: -1rem;
+    right: 8%;
+    bottom: -1rem;
+    background: linear-gradient(
+      155deg,
+      rgba(255, 214, 40, 0.94) 0%,
+      rgba(255, 204, 0, 0.82) 62%,
+      rgba(255, 204, 0, 0) 100%
+    );
+    z-index: -1;
+    pointer-events: none;
   }
 
   .hero-title {
@@ -1519,21 +1546,23 @@ a {
   }
 
   .hero-title-text {
-    color: var(--white);
-    text-shadow: 0 2px 28px rgba(10, 9, 8, 0.4);
+    color: var(--black);
+    text-shadow:
+      0 0 24px rgba(255, 204, 0, 0.55),
+      0 1px 0 rgba(255, 255, 255, 0.2);
   }
 
   .hero-title-ghost {
-    -webkit-text-stroke: 1px rgba(255, 255, 255, 0.14);
+    -webkit-text-stroke: 1px rgba(10, 9, 8, 0.14);
   }
 
   .hero-tagline {
-    color: rgba(242, 237, 226, 0.95);
+    color: rgba(10, 9, 8, 0.72);
     font-size: 1.0625rem;
     line-height: 1.62;
     margin-bottom: 1.75rem;
     max-width: none;
-    text-shadow: 0 1px 18px rgba(10, 9, 8, 0.5);
+    text-shadow: 0 0 20px rgba(255, 204, 0, 0.45);
     text-wrap: balance;
   }
 
@@ -1546,46 +1575,43 @@ a {
   .btn-hero-outline {
     justify-content: center;
     width: 100%;
-    color: var(--white);
-    border-color: rgba(255, 255, 255, 0.42);
-    background: rgba(10, 9, 8, 0.22);
-    backdrop-filter: blur(10px);
+    color: var(--black);
+    border-color: rgba(10, 9, 8, 0.28);
+    background: rgba(255, 255, 255, 0.16);
+    backdrop-filter: blur(6px);
     padding: 1rem 1.25rem;
     min-height: 3rem;
   }
 
   .btn-hero-outline:hover {
-    border-color: rgba(255, 255, 255, 0.75);
-    background: rgba(10, 9, 8, 0.38);
-    color: var(--white);
+    border-color: var(--black);
+    background: rgba(10, 9, 8, 0.06);
+    color: var(--black);
   }
 
   .hero-powered {
-    color: rgba(242, 237, 226, 0.68);
+    color: rgba(10, 9, 8, 0.5);
     font-size: 0.6875rem;
     line-height: 1.5;
-    text-shadow: 0 1px 14px rgba(10, 9, 8, 0.45);
+    text-shadow: 0 0 16px rgba(255, 204, 0, 0.4);
   }
 
   .hero-powered a {
-    color: rgba(242, 237, 226, 0.9);
+    color: rgba(10, 9, 8, 0.68);
   }
 
   .hero-powered a:hover {
-    color: var(--white);
-  }
-
-  .hero :focus-visible {
-    outline-color: var(--white);
+    color: var(--black);
   }
 
   .scroll-cue {
     bottom: max(1.5rem, env(safe-area-inset-bottom));
-    color: rgba(242, 237, 226, 0.72);
+    color: rgba(10, 9, 8, 0.5);
+    text-shadow: 0 0 12px rgba(255, 204, 0, 0.5);
   }
 
   .scroll-cue:hover {
-    color: var(--white);
+    color: var(--black);
   }
 
   .section-title {

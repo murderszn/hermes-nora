@@ -39,19 +39,55 @@ float inTrail(float order, float head){
   return step(dist, TRAIL);
 }
 
+bool isNora(vec2 localId) {
+  float x = localId.x;
+  float y = localId.y;
+  
+  // Letter 0: N (columns 0, 1, 2)
+  if (x >= -0.5 && x <= 2.5) {
+    return (x < 0.5 || x > 1.5 || (x > 0.5 && x < 1.5 && y > 1.5 && y < 2.5));
+  }
+  // Letter 1: O (columns 4, 5, 6)
+  if (x >= 3.5 && x <= 6.5) {
+    float lx = x - 4.0;
+    return (lx < 0.5 || lx > 1.5 || y < 0.5 || y > 3.5);
+  }
+  // Letter 2: R (columns 8, 9, 10)
+  if (x >= 7.5 && x <= 10.5) {
+    float lx = x - 8.0;
+    return (lx < 0.5 || 
+           (y > 3.5 && lx > 0.5 && lx < 1.5) || 
+           (y > 2.5 && y < 3.5 && lx > 1.5) || 
+           (y > 1.5 && y < 2.5 && lx > 0.5 && lx < 1.5) || 
+           (y > 0.5 && y < 1.5 && lx > 1.5) || 
+           (y < 0.5 && lx > 1.5));
+  }
+  // Letter 3: A (columns 12, 13, 14)
+  if (x >= 11.5 && x <= 14.5) {
+    float lx = x - 12.0;
+    return (lx < 0.5 || lx > 1.5 || y > 3.5 || (y > 1.5 && y < 2.5));
+  }
+  return false;
+}
+
 void main(){
   float mn = sqrt(u_res.x * u_res.y);
-  vec2 p = (gl_FragCoord.xy - 0.5 * u_res) / mn;
+  // Align from the top-left of the canvas
+  vec2 p = vec2(gl_FragCoord.x, u_res.y - gl_FragCoord.y) / mn;
   p *= mix(1.2, 2.6, u_scale) * 3.0;
-  p += vec2(fract(u_seed * 0.193), fract(u_seed * 0.317)) * 2.0;
 
   float tick = floor(u_time * 1.6);
   float freq = 5.0 + u_density * 7.0;
-  vec2 gv = p * freq;
-  vec2 id = floor(gv);
+  
+  float gutter = 0.05;
+  // Shift slightly so the top-left edge starts inside the first cell rather than on the gutter
+  vec2 gv = p * freq + vec2(gutter * 1.5);
   vec2 f = fract(gv);
 
-  float gutter = 0.05;
+  // Add integer seed offset to randomize patterns without shifting the grid boundaries
+  vec2 seedOffset = floor(vec2(fract(u_seed * 0.193), fract(u_seed * 0.317)) * 20.0);
+  vec2 id = floor(gv) + seedOffset;
+
   float inBox = step(gutter, f.x) * step(f.x, 1.0 - gutter)
               * step(gutter, f.y) * step(f.y, 1.0 - gutter);
 
@@ -86,10 +122,25 @@ void main(){
   float sparkHead = mod(tick * 4.3 + u_seed * 7.2, CYCLE);
   float cellSpark = nearHead(cellOrder, sparkHead) * pulse;
 
+  // Center the word "NORA" relative to screen geometry, independent of seedOffset
+  vec2 centerId = floor((vec2(0.5 * u_res.x, 0.5 * u_res.y) / mn) * mix(1.2, 2.6, u_scale) * 3.0 * freq + vec2(gutter * 1.5));
+  vec2 relId = floor(gv) - centerId;
+
+  bool inWord = false;
+  vec2 localId = relId + vec2(7.0, 2.0);
+  if (localId.x >= -0.5 && localId.x < 15.0 && localId.y >= -0.5 && localId.y < 5.0) {
+    inWord = isNora(localId);
+  }
+
   float highlighted = clamp(
     max(addressed, clusterActive * 0.95) + cellSpark * 0.85,
     0.0, 1.0
   );
+
+  if (inWord) {
+    float wave = 0.8 + 0.2 * sin(u_time * 2.5 - length(p - vec2(0.5 * u_res.x, 0.5 * u_res.y) / mn) * 6.0);
+    highlighted = wave;
+  }
 
   float fill = inBox * (1.0 - highlighted);
   vec3 col = mix(u_yellow, u_black, fill);

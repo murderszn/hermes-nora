@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en" id="top">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Docs | Nora — Hermes Agent Ops Persona</title>
+  <meta name="description" content="Get Nora running: prerequisites, install guides for Git, Node, Python, and Hermes Agent. Talk from your phone. Real use cases and best practices.">
+  <meta name="theme-color" content="#ffcc00">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="docs.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>◉</text></svg>">
+</head>
+<body class="docs-page">
+  <a href="#getting-started" class="skip-link">Skip to content</a>
+
+  <nav class="nav nav--dark nav--static">
+    <a href="index.html" class="nav-logo" aria-label="Nora — home">Nora</a>
+    <div class="nav-links">
+      <a href="docs.html" class="nav-active">Docs</a>
+      <a href="index.html#install">Install</a>
+      <a href="https://github.com/murderszn/hermes-nora" target="_blank" rel="noopener" class="nav-gh">GitHub</a>
+    </div>
+  </nav>
+
+  <header class="docs-hero">
+    <div class="docs-hero-inner">
+      <p class="section-label">Documentation</p>
+      <h1 class="docs-title">The technology behind Nora</h1>
+      <p class="docs-lead">
+        Nora is not a new AI model. She is a persona, a dashboard, and a set of practices
+        built on top of <a href="https://hermes-agent.nousresearch.com" target="_blank" rel="noopener">Hermes Agent</a> —
+        giving you an always-on, locally rooted assistant you can reach from your computer
+        or your phone.
+      </p>
+      <div class="docs-hero-links">
+        <a href="index.html#install" class="btn btn-primary">Install Nora</a>
+        <a href="#getting-started" class="btn btn-ghost">Getting started</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="docs-main">
+    <aside class="docs-toc" aria-label="Table of contents">
+      <p class="docs-toc-label">On this page</p>
+      <nav>
+        <a href="#getting-started">Getting started</a>
+        <a href="#prerequisites">Prerequisites</a>
+        <a href="#install-guides">Install guides</a>
+        <a href="#phone">Your phone</a>
+        <a href="#channels">Connect channels</a>
+        <a href="#overview">Overview</a>
+        <a href="#use-cases">Use cases</a>
+        <a href="#hardware">Hardware</a>
+        <a href="#practices">Best practices</a>
+        <a href="#human-20">Human 2.0</a>
+      </nav>
+    </aside>
+
+    <article class="docs-content">
+
+      <section id="getting-started" class="docs-section">
+        <h2>Getting started</h2>
+        <p>
+          You do not need to be technical. You do need to install a few basics once,
+          then follow the steps in order. Think of this as onboarding — not a computer
+          science course.
+        </p>
+
+        <ol class="docs-path">
+          <li>
+            <span class="docs-path-num" aria-hidden="true"></span>
+            <div class="docs-path-body">
+              <h3>Install prerequisites</h3>
+              <p>Git, Node.js, and Python — the foundation Hermes expects. See <a href="#install-guides">install guides</a> below.</p>
+            </div>
+          </li>
+          <li>
+            <span class="docs-path-num" aria-hidden="true"></span>
+            <div class="docs-path-body">
+              <h3>Install Hermes Agent</h3>
+              <p>Download the desktop app or use the terminal installer from <a href="https://hermes-agent.nousresearch.com" target="_blank" rel="noopener">hermes-agent.nousresearch.com</a>. This is the engine.</p>
+            </div>
+          </li>
+          <li>
+            <span class="docs-path-num" aria-hidden="true"></span>
+            <div class="docs-path-body">
+              <h3>Install Nora</h3>
+              <p>Pull the persona addon from <a href="index.html#install">the home page install section</a> or run the one-line script.</p>
+            </div>
+          </li>
+          <li>
+            <span class="docs-path-num" aria-hidden="true"></span>
+            <div class="docs-path-body">
+              <h3>Connect a channel</h3>
+              <p>Hook up Discord or Gmail first — that is how you will actually talk to her. Details in <a href="#channels">connect channels</a>.</p>
+            </div>
+          </li>
+          <li>
+            <span class="docs-path-num" aria-hidden="true"></span>
+            <div class="docs-path-body">
+              <h3>Open the dashboard</h3>
+              <p>Launch the local control panel on your home machine. Wire in what you want Nora to manage.</p>
+            </div>
+          </li>
+          <li>
+            <span class="docs-path-num" aria-hidden="true"></span>
+            <div class="docs-path-body">
+              <h3>Say hello from anywhere</h3>
+              <p>Once a channel is live, your phone works too. Discord app or Gmail — same Nora, same memory. See <a href="#phone">your phone</a>.</p>
+            </div>
+          </li>
+        </ol>
+
+        <div class="docs-callout">
+          <h3>You are set up when…</h3>
+          <ul class="docs-checklist">
+            <li>Hermes is running on your home machine (or hub Mac mini)</li>
+            <li>Nora persona is loaded and the dashboard opens in your browser</li>
+            <li>You sent a test message via Discord or email and got a reply</li>
+            <li>You can reach her from your phone using that same channel</li>
+          </ul>
+        </div>
+      </section>
+
+      <section id="prerequisites" class="docs-section">
+        <h2>Prerequisites</h2>
+        <p>
+          Before Hermes or Nora, your machine needs a short list of tools. Most installs
+          take under thirty minutes if you go one at a time.
+        </p>
+
+        <table class="docs-table">
+          <thead>
+            <tr>
+              <th>Tool</th>
+              <th>Why you need it</th>
+              <th>Verify</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Git</td>
+              <td>Clone Nora, pull updates, manage local repos</td>
+              <td><code class="docs-inline-code">git --version</code></td>
+            </tr>
+            <tr>
+              <td>Node.js + npm</td>
+              <td>Hermes ecosystem and many agent tools run on Node</td>
+              <td><code class="docs-inline-code">node -v && npm -v</code></td>
+            </tr>
+            <tr>
+              <td>Python 3</td>
+              <td>Skills, scripts, RPC tools, and automation Hermes delegates to</td>
+              <td><code class="docs-inline-code">python3 --version</code></td>
+            </tr>
+            <tr>
+              <td>Terminal</td>
+              <td>Install scripts and occasional status checks — Terminal on Mac, PowerShell on Windows</td>
+              <td>—</td>
+            </tr>
+            <tr>
+              <td>API key</td>
+              <td>A model provider key (Nous / your chosen LLM) — Hermes walks you through this on first launch</td>
+              <td>—</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p class="docs-note">
+          Hermes desktop installers bundle much of this for Mac and Windows. If you use
+          the terminal path on Linux, install Git, Node, and Python first using the guides below.
+        </p>
+      </section>
+
+      <section id="install-guides" class="docs-section">
+        <h2>Install guides</h2>
+        <p>
+          Copy-paste friendly steps for the basics. Pick your platform tab mentally —
+          all three are covered in each guide.
+        </p>
+
+        <div class="docs-guide">
+          <div class="docs-guide-header">
+            <h3>Git</h3>
+            <span class="docs-guide-tag">Required</span>
+          </div>
+          <div class="docs-guide-body">
+            <p>Git lets you clone Nora and keep it updated. Nora's install script will fail without it.</p>
+            <p class="docs-subhead">macOS</p>
+            <p>Option A — Xcode Command Line Tools (simplest):</p>
+            <code class="docs-code">xcode-select --install</code>
+            <p>Option B — <a href="https://git-scm.com/download/mac" target="_blank" rel="noopener">Download Git for Mac</a> if you prefer a standalone installer.</p>
+            <p class="docs-subhead">Windows</p>
+            <p>Download and run the installer from <a href="https://git-scm.com/download/win" target="_blank" rel="noopener">git-scm.com/download/win</a>. Accept defaults; use "Git from the command line and also from 3rd-party software."</p>
+            <p class="docs-subhead">Linux</p>
+            <code class="docs-code"># Debian / Ubuntu
+sudo apt update && sudo apt install -y git
+
+# Fedora
+sudo dnf install -y git</code>
+            <div class="docs-verify">
+              <p class="docs-verify-label">Verify</p>
+              <code class="docs-code">git --version</code>
+            </div>
+          </div>
+        </div>
+
+        <div class="docs-guide">
+          <div class="docs-guide-header">
+            <h3>Node.js & npm</h3>
+            <span class="docs-guide-tag">Required</span>
+          </div>
+          <div class="docs-guide-body">
+            <p>Node powers large parts of the Hermes toolchain. Install the <strong>LTS</strong> version — not the bleeding-edge release.</p>
+            <p class="docs-subhead">macOS & Windows</p>
+            <p>Download the LTS installer from <a href="https://nodejs.org" target="_blank" rel="noopener">nodejs.org</a>. Run it; npm ships alongside Node automatically.</p>
+            <p class="docs-subhead">Linux</p>
+            <code class="docs-code"># Using NodeSource (Ubuntu/Debian example)
+curl -fsSL https://deb.nodesource.com/setup_lts.x | sudo -E bash -
+sudo apt install -y nodejs</code>
+            <p>Alternatively use your distro's package manager if it offers a recent LTS build.</p>
+            <div class="docs-verify">
+              <p class="docs-verify-label">Verify</p>
+              <code class="docs-code">node -v
+npm -v</code>
+            </div>
+          </div>
+        </div>
+
+        <div class="docs-guide">
+          <div class="docs-guide-header">
+            <h3>Python 3</h3>
+            <span class="docs-guide-tag">Required</span>
+          </div>
+          <div class="docs-guide-body">
+            <p>Hermes delegates many tasks to Python scripts — skills, automation, data work. Python 3.10+ is a safe target.</p>
+            <p class="docs-subhead">macOS</p>
+            <p>Recent macOS versions include Python 3. If <code class="docs-inline-code">python3 --version</code> fails, install from <a href="https://www.python.org/downloads/" target="_blank" rel="noopener">python.org</a> or run:</p>
+            <code class="docs-code">brew install python3</code>
+            <p class="docs-subhead">Windows</p>
+            <p>Download from <a href="https://www.python.org/downloads/windows/" target="_blank" rel="noopener">python.org/downloads/windows</a>. Check <strong>"Add python.exe to PATH"</strong> during install — this is the step most people miss.</p>
+            <p class="docs-subhead">Linux</p>
+            <code class="docs-code"># Debian / Ubuntu
+sudo apt update && sudo apt install -y python3 python3-pip python3-venv
+
+# Fedora
+sudo dnf install -y python3 python3-pip</code>
+            <div class="docs-verify">
+              <p class="docs-verify-label">Verify</p>
+              <code class="docs-code">python3 --version
+pip3 --version</code>
+            </div>
+          </div>
+        </div>
+
+        <div class="docs-guide">
+          <div class="docs-guide-header">
+            <h3>Hermes Agent</h3>
+            <span class="docs-guide-tag">Core</span>
+          </div>
+          <div class="docs-guide-body">
+            <p>Hermes is the agent runtime. Install it before Nora.</p>
+            <p class="docs-subhead">macOS 12+</p>
+            <p>Download the <code class="docs-inline-code">.dmg</code> from <a href="https://hermes-agent.nousresearch.com" target="_blank" rel="noopener">hermes-agent.nousresearch.com</a>, drag to Applications, and open. Follow the setup wizard for your API key and gateway.</p>
+            <p class="docs-subhead">Windows 10/11</p>
+            <p>Download the <code class="docs-inline-code">.exe</code> installer from the same site. Run as administrator if Windows prompts you.</p>
+            <p class="docs-subhead">Linux</p>
+            <p>Use the terminal install path on the Hermes site — same pattern as Nora:</p>
+            <code class="docs-code">curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash</code>
+            <p class="docs-note">Exact URL may vary — always use the current link from the official Hermes docs.</p>
+            <div class="docs-verify">
+              <p class="docs-verify-label">Verify</p>
+              <p>Hermes opens, accepts your API key, and shows a connected status in the app or CLI.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="docs-guide">
+          <div class="docs-guide-header">
+            <h3>Nora addon</h3>
+            <span class="docs-guide-tag">Persona</span>
+          </div>
+          <div class="docs-guide-body">
+            <p>Once Hermes is running, add Nora — persona, skills, and dashboard defaults.</p>
+            <p class="docs-subhead">macOS / Linux</p>
+            <code class="docs-code">curl -fsSL https://raw.githubusercontent.com/murderszn/hermes-nora/main/install.sh | bash</code>
+            <p class="docs-subhead">Windows (PowerShell)</p>
+            <code class="docs-code">irm https://raw.githubusercontent.com/murderszn/hermes-nora/main/install.ps1 | iex</code>
+            <p class="docs-subhead">GitHub CLI</p>
+            <code class="docs-code">gh repo clone murderszn/hermes-nora && cd hermes-nora && ./bootstrap.sh</code>
+            <p>Then point Hermes at the Nora directory per the bootstrap output. Full commands also live on the <a href="index.html#install">home page</a>.</p>
+            <div class="docs-verify">
+              <p class="docs-verify-label">Verify</p>
+              <code class="docs-code">ls ~/.nora   # or your install path
+# persona/, skills/, tools/ should exist after bootstrap</code>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="phone" class="docs-section">
+        <h2>Your phone works too</h2>
+        <p>
+          Nora runs on your <strong>computer</strong>, not inside your phone. But once Hermes
+          is connected to Discord or email, you talk to her through apps you already have.
+          No special mobile app required.
+        </p>
+
+        <div class="docs-callout">
+          <h3>The mental model</h3>
+          <p>
+            <strong>Home machine</strong> = Nora's body (always on, does the work).<br>
+            <strong>Phone</strong> = your pocket remote (send messages, get replies, approve tasks).
+          </p>
+        </div>
+
+        <div class="docs-phone-grid">
+          <div class="docs-phone-card">
+            <div class="docs-phone-icon" aria-hidden="true">💬</div>
+            <h3>Discord</h3>
+            <p>Install Discord on iOS or Android. DM your Nora bot or post in a channel she monitors. Replies land on your phone instantly.</p>
+          </div>
+          <div class="docs-phone-card">
+            <div class="docs-phone-icon" aria-hidden="true">✉️</div>
+            <h3>Gmail</h3>
+            <p>Give Nora her own address. Email her from your phone's mail app — great for longer tasks, attachments, and async project work.</p>
+          </div>
+          <div class="docs-phone-card">
+            <div class="docs-phone-icon" aria-hidden="true">📱</div>
+            <h3>Other channels</h3>
+            <p>Telegram, Slack, Signal, WhatsApp — Hermes supports a growing list. Same idea: app on phone, agent on machine.</p>
+          </div>
+        </div>
+
+        <p>
+          This is how a MacBook + home hub setup feels seamless: you are on the road with
+          your phone, Nora is on the Mac mini at home, and Discord is the bridge between you.
+        </p>
+      </section>
+
+      <section id="channels" class="docs-section">
+        <h2>Connect channels</h2>
+        <p>
+          Pick <strong>one channel to start</strong>. Get it working end-to-end before you add more.
+        </p>
+
+        <div class="docs-guide">
+          <div class="docs-guide-header">
+            <h3>Discord (recommended first)</h3>
+            <span class="docs-guide-tag">Chat</span>
+          </div>
+          <div class="docs-guide-body">
+            <ol class="docs-steps">
+              <li>Create a Discord server (or use an existing one) where Nora will live.</li>
+              <li>In the <a href="https://discord.com/developers/applications" target="_blank" rel="noopener">Discord Developer Portal</a>, create an application and bot. Copy the bot token.</li>
+              <li>In Hermes settings, add the Discord gateway and paste your token. Enable the intents Hermes requests.</li>
+              <li>Invite the bot to your server with message permissions.</li>
+              <li>Send <code class="docs-inline-code">hello</code> in a channel. Nora should reply.</li>
+              <li>Open Discord on your phone and repeat — same conversation, same agent.</li>
+            </ol>
+          </div>
+        </div>
+
+        <div class="docs-guide">
+          <div class="docs-guide-header">
+            <h3>Gmail</h3>
+            <span class="docs-guide-tag">Email</span>
+          </div>
+          <div class="docs-guide-body">
+            <ol class="docs-steps">
+              <li>Create a dedicated Gmail account for Nora (e.g. <code class="docs-inline-code">nora.yourname@gmail.com</code>).</li>
+              <li>In <a href="https://console.cloud.google.com" target="_blank" rel="noopener">Google Cloud Console</a>, create a project and enable the Gmail API.</li>
+              <li>Create OAuth credentials or a service account — Hermes docs cover the exact flow for your setup.</li>
+              <li>Connect the inbox in Hermes. Send a test email from your personal account.</li>
+              <li>Nora replies. You can continue the thread from Gmail on your phone.</li>
+            </ol>
+            <p class="docs-note">
+              Email is slower than chat but better for project handoffs, newsletters, and anything you want an audit trail for.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="overview" class="docs-section">
+        <h2>Overview</h2>
+        <p>
+          Nora is <strong>Hermes Agent</strong> with a personality layer and a
+          <strong>local control dashboard</strong>. Hermes handles memory, skills, tool use,
+          scheduling, and multi-channel messaging. Nora adds the ops persona, dashboards,
+          and defaults for people who want a capable assistant without living in a terminal.
+        </p>
+
+        <div class="docs-card-grid">
+          <div class="docs-card">
+            <h3>Hermes Agent</h3>
+            <p>The runtime. Persistent memory, skill generation, subagents, sandboxing, gateway scheduling. Built by <a href="https://nousresearch.com" target="_blank" rel="noopener">Nous Research</a>.</p>
+          </div>
+          <div class="docs-card">
+            <h3>Nora persona</h3>
+            <p>Voice, skills, and ops defaults as a drop-in addon. MIT licensed on <a href="https://github.com/murderszn/hermes-nora" target="_blank" rel="noopener">GitHub</a>.</p>
+          </div>
+          <div class="docs-card">
+            <h3>Local dashboard</h3>
+            <p>Web UI on your machine to control the agent, your computer, and anything you configure — GPUs, forums, backups, newsletters.</p>
+          </div>
+        </div>
+
+        <h3>The local dashboard</h3>
+        <ul class="docs-list">
+          <li>Start, pause, or inspect Hermes and scheduled tasks</li>
+          <li>Trigger file ops, cleanup, monitoring, and backups</li>
+          <li>Wire custom panels: GPU jobs, Discord status, cloud sync, newsletter drafts</li>
+          <li>See what ran, what failed, and what is queued — without SSH</li>
+        </ul>
+      </section>
+
+      <section id="use-cases" class="docs-section">
+        <h2>Real use cases</h2>
+        <p>Patterns that work today — not slide-deck fiction.</p>
+
+        <div class="docs-use-case">
+          <span class="docs-use-tag">Work agent</span>
+          <h3>Two computers, one assistant</h3>
+          <p>MacBook for daily work, home Mac as the hub. Discord for chat, Gmail for async. Nora has her own inbox — employee reviews become folders plus short notes; she files and organizes on the local machine.</p>
+        </div>
+
+        <div class="docs-use-case">
+          <span class="docs-use-tag">Compute</span>
+          <h3>GPU scheduling for Folding@home</h3>
+          <p>RTX 5060 Ti idle most of the day. Hermes watches load — when you are not gaming, Nora spins up Folding@home for biomedical research.</p>
+        </div>
+
+        <div class="docs-use-case">
+          <span class="docs-use-tag">Community</span>
+          <h3>Discord & forum management</h3>
+          <p>Nora Discord and Motion Discord today; Reddit or any forum tomorrow. Welcome flows, routine posts, escalation summaries.</p>
+        </div>
+
+        <div class="docs-use-case">
+          <span class="docs-use-tag">Ops</span>
+          <h3>Cleanup, monitoring, optimization</h3>
+          <p>Disk space, stale downloads, log rotation, morning briefings — scheduled in plain language.</p>
+        </div>
+
+        <div class="docs-use-case">
+          <span class="docs-use-tag">Backup</span>
+          <h3>Cloud repos locally</h3>
+          <p>Git remotes and GCP projects cloned to your machine. Nora monitors sync and reports drift.</p>
+        </div>
+
+        <div class="docs-use-case">
+          <span class="docs-use-tag">Publishing</span>
+          <h3>Saturday newsletter</h3>
+          <p>You prepare content; Nora sends via Gmail API on schedule. Same pattern for digests and client updates.</p>
+        </div>
+
+        <h3>Tools you will combine</h3>
+        <table class="docs-table">
+          <thead>
+            <tr><th>Tool</th><th>Role</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Hermes tools</td><td>Terminal, browser, scheduling, memory, subagents</td></tr>
+            <tr><td>Playwright</td><td>Browser automation when you need a real page</td></tr>
+            <tr><td>Beautiful Soup</td><td>Parse HTML for scraping and monitoring</td></tr>
+            <tr><td>Google APIs</td><td>Gmail, Drive, Calendar</td></tr>
+            <tr><td>Discord / Slack / Telegram</td><td>Where you — and your phone — talk to Nora</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section id="hardware" class="docs-section">
+        <h2>Hardware recommendations</h2>
+        <p>A machine that stays on, stays reachable, and stays secure. Practical defaults:</p>
+
+        <div class="docs-hardware-grid">
+          <div class="docs-card docs-card--accent">
+            <h3>MacBook Neo</h3>
+            <p class="docs-card-meta">On the road</p>
+            <p>Travel machine with agentic headroom. Discord and Gmail from your phone; light tasks when away from home.</p>
+          </div>
+          <div class="docs-card docs-card--accent">
+            <h3>Mac mini</h3>
+            <p class="docs-card-meta">Home hub</p>
+            <p>Always-on anchor. Hermes 24/7, dashboard, GPUs, forums, backups — reachable from anywhere.</p>
+          </div>
+          <div class="docs-card docs-card--accent">
+            <h3>Your phone</h3>
+            <p class="docs-card-meta">Remote control</p>
+            <p>Not the host — the remote. Discord + Gmail apps are enough once channels are connected.</p>
+          </div>
+        </div>
+
+        <div class="docs-callout">
+          <h3>Two-machine + phone pattern</h3>
+          <p>
+            <strong>Mac mini at home</strong> runs Nora 24/7.<br>
+            <strong>MacBook Neo</strong> goes with you for local work.<br>
+            <strong>Phone</strong> talks to Nora over Discord or email wherever you are.<br>
+            One persona, three surfaces, one memory when channels are synced.
+          </p>
+        </div>
+      </section>
+
+      <section id="practices" class="docs-section">
+        <h2>Best practices for lay users</h2>
+        <ol class="docs-steps">
+          <li><strong>Give her a real inbox.</strong> Dedicated Gmail = audit trail + calm async channel.</li>
+          <li><strong>One channel first.</strong> Discord <em>or</em> Gmail — not both on day one.</li>
+          <li><strong>Describe outcomes.</strong> "Make folders for each teammate and file my review notes" — not click-by-click instructions.</li>
+          <li><strong>Schedule the boring stuff.</strong> Backups, cleanup, newsletters, Folding@home — let the gateway remember.</li>
+          <li><strong>Dashboard = source of truth.</strong> If it is not wired in, Nora should not pretend it exists.</li>
+          <li><strong>Start read-only.</strong> Summaries and proposals before destructive file or send permissions.</li>
+          <li><strong>Test from your phone early.</strong> If Discord works on mobile, your setup is real.</li>
+          <li><strong>Hermes docs for tools; Nora docs for patterns.</strong> Upstream = capability. Here = how humans deploy it.</li>
+        </ol>
+      </section>
+
+      <section id="human-20" class="docs-section docs-section--highlight">
+        <h2>Human 1.0 → Human 2.0</h2>
+        <p>
+          Internet access once separated people by <em>availability</em>, not intelligence.
+          Agents are the next layer. Human 1.0 has no always-on assistant. Human 2.0 has
+          one reachable on Discord, accountable over Gmail, rooted on a home hub — and in
+          their pocket via the same apps.
+        </p>
+        <p>
+          Nora can be your first. Local, charming, configured for your life, and awake
+          when you are not.
+        </p>
+        <div class="docs-cta-inline">
+          <a href="index.html#install" class="btn btn-primary btn-lg">Deploy Nora</a>
+          <a href="#getting-started" class="btn btn-ghost">Getting started</a>
+        </div>
+      </section>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <span class="footer-brand">Nora</span>
+      <div class="footer-links">
+        <a href="index.html">Home</a>
+        <a href="docs.html">Docs</a>
+        <a href="https://github.com/murderszn/hermes-nora" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://hermes-agent.nousresearch.com" target="_blank" rel="noopener">Hermes Agent</a>
+        <a href="LICENSE">MIT License</a>
+      </div>
+      <p class="footer-copy">© 2026 Nora. Open source under MIT.</p>
+    </div>
+  </footer>
+</body>
+</html>

@@ -6,6 +6,15 @@
 
 Local setup of [Hermes Agent](https://hermes-agent.nousresearch.com/) named **Nora**, bound to Discord, with a custom JARVIS-style control dashboard.
 
+## Website
+
+The Nora splash page and documentation live in [`website/`](website/) and deploy automatically to GitHub Pages:
+
+**https://murderszn.github.io/hermes-nora/**
+
+- Home: install commands, feature overview
+- Docs: prerequisites, install guides, use cases, hardware recommendations
+
 ## Dashboard preview
 
 ![Hermes dashboard wallpaper](dashboard/assets/hermes-wallpaper.jfif)

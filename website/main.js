@@ -1,0 +1,221 @@
+const overlay = document.getElementById('overlay');
+const overlayBg = document.getElementById('overlay-bg');
+const scrollSpacer = document.getElementById('scroll-spacer');
+const nav = document.getElementById('nav');
+const scrollCue = document.getElementById('scroll-cue');
+const scrollProgress = document.getElementById('scroll-progress');
+
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+let revealHeight = window.innerHeight;
+let scrollTicking = false;
+let lastScrollY = 0;
+
+function updateRevealHeight() {
+  revealHeight = scrollSpacer.offsetHeight || window.innerHeight;
+}
+
+function getNavOffset() {
+  const navHeight = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--nav-height'), 10) || 72;
+  return navHeight + 16;
+}
+
+function scrollToTarget(targetId) {
+  const el = document.getElementById(targetId);
+  if (!el) return;
+
+  const needsReveal = window.scrollY < revealHeight - 4;
+  const targetTop = el.getBoundingClientRect().top + window.scrollY - getNavOffset();
+
+  if (needsReveal && !prefersReducedMotion) {
+    window.scrollTo({ top: revealHeight, behavior: 'auto' });
+    requestAnimationFrame(() => {
+      window.scrollTo({ top: targetTop, behavior: 'smooth' });
+    });
+  } else if (needsReveal) {
+    window.scrollTo({ top: Math.max(revealHeight, targetTop) });
+  } else {
+    window.scrollTo({ top: targetTop, behavior: 'smooth' });
+  }
+}
+
+function handleScroll() {
+  const scrollY = window.scrollY;
+  lastScrollY = scrollY;
+  const progress = Math.min(scrollY / revealHeight, 1);
+
+  if (prefersReducedMotion) {
+    if (scrollY >= revealHeight - 1) {
+      overlay.style.transform = `translate3d(0, -${revealHeight}px, 0)`;
+      overlay.classList.add('is-revealed');
+    } else {
+      overlay.style.transform = 'translate3d(0, 0, 0)';
+      overlay.classList.remove('is-revealed');
+    }
+  } else {
+    overlay.style.transform = `translate3d(0, -${scrollY}px, 0)`;
+    if (overlayBg) {
+      overlayBg.style.transform = `translate3d(0, ${scrollY * 0.12}px, 0)`;
+    }
+    overlay.classList.toggle('is-revealed', scrollY >= revealHeight - 1);
+  }
+
+  if (scrollProgress) {
+    scrollProgress.style.transform = `scaleX(${progress})`;
+  }
+
+  scrollCue?.classList.toggle('is-hidden', progress > 0.08);
+}
+
+function onScroll() {
+  if (!scrollTicking) {
+    scrollTicking = true;
+    requestAnimationFrame(() => {
+      handleScroll();
+      scrollTicking = false;
+    });
+  }
+}
+
+function updateNavTheme() {
+  const features = document.getElementById('features');
+  if (!features) return;
+
+  const featuresTop = features.getBoundingClientRect().top;
+  const install = document.getElementById('install');
+  const installTop = install?.getBoundingClientRect().top ?? Infinity;
+
+  if (featuresTop <= getNavOffset() + 8) {
+    nav.classList.remove('nav--light', 'nav--dark');
+    nav.classList.add('nav--yellow');
+  } else if (installTop <= getNavOffset() + 8 || lastScrollY >= revealHeight - 1) {
+    nav.classList.remove('nav--light', 'nav--yellow');
+    nav.classList.add('nav--dark');
+  } else {
+    nav.classList.remove('nav--dark', 'nav--yellow');
+    nav.classList.add('nav--light');
+  }
+}
+
+function init() {
+  document.documentElement.classList.add('js');
+
+  updateRevealHeight();
+  nav.classList.add('nav--light');
+  handleScroll();
+  updateNavTheme();
+
+  if (location.hash) {
+    const id = location.hash.slice(1);
+    requestAnimationFrame(() => scrollToTarget(id));
+  }
+}
+
+init();
+
+window.addEventListener('scroll', () => {
+  onScroll();
+  updateNavTheme();
+}, { passive: true });
+
+window.addEventListener('resize', () => {
+  updateRevealHeight();
+  handleScroll();
+  updateNavTheme();
+});
+
+window.addEventListener('hashchange', () => {
+  if (location.hash) scrollToTarget(location.hash.slice(1));
+});
+
+window.addEventListener('pageshow', (e) => {
+  if (e.persisted) {
+    updateRevealHeight();
+    handleScroll();
+    updateNavTheme();
+  }
+});
+
+scrollCue?.addEventListener('click', () => scrollToTarget('install'));
+
+document.querySelectorAll('[data-scroll-target]').forEach((el) => {
+  el.addEventListener('click', (e) => {
+    e.preventDefault();
+    scrollToTarget(el.dataset.scrollTarget);
+  });
+});
+
+document.querySelector('.nav-logo')?.addEventListener('click', (e) => {
+  e.preventDefault();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+function selectPlatform(platform) {
+  document.querySelectorAll('.platform-card').forEach((card) => {
+    const isActive = card.dataset.platform === platform;
+    card.classList.toggle('active', isActive);
+    card.setAttribute('aria-checked', isActive ? 'true' : 'false');
+    const btn = card.querySelector('.platform-select');
+    if (btn) {
+      btn.textContent = isActive ? 'Selected' : 'Select';
+      btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+    }
+  });
+
+  document.querySelectorAll('.command-panel').forEach((panel) => {
+    panel.classList.toggle('active', panel.id === `cmd-${platform}`);
+  });
+}
+
+document.querySelectorAll('.platform-card').forEach((card) => {
+  card.addEventListener('click', () => {
+    selectPlatform(card.dataset.platform);
+  });
+  card.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      selectPlatform(card.dataset.platform);
+    }
+  });
+});
+
+document.querySelectorAll('.copy-btn').forEach((btn) => {
+  btn.addEventListener('click', async (e) => {
+    e.stopPropagation();
+    const text = btn.dataset.copy;
+    const label = btn.querySelector('.copy-text');
+    try {
+      await navigator.clipboard.writeText(text);
+      btn.classList.add('copied');
+      label.textContent = 'Copied';
+      btn.setAttribute('aria-label', 'Copied to clipboard');
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        label.textContent = 'Copy';
+        btn.setAttribute('aria-label', 'Copy command');
+      }, 2000);
+    } catch {
+      label.textContent = 'Failed';
+      btn.setAttribute('aria-label', 'Copy failed');
+      setTimeout(() => {
+        label.textContent = 'Copy';
+        btn.setAttribute('aria-label', 'Copy command');
+      }, 2000);
+    }
+  });
+});
+
+const revealObserver = new IntersectionObserver(
+  (entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('is-visible');
+      }
+    });
+  },
+  { threshold: 0.12, rootMargin: '0px 0px -60px 0px' }
+);
+
+document.querySelectorAll('.reveal-on-scroll').forEach((el) => {
+  revealObserver.observe(el);
+});

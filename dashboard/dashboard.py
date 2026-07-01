@@ -8,9 +8,11 @@ directory and agent telemetry, and serves a JARVIS-style HTML dashboard.
 Stdlib only. Run it, then open http://127.0.0.1:7878
 """
 import ctypes
+import functools
 import json
 import os
 import re
+import shutil
 import socket
 import subprocess
 import sys
@@ -20,6 +22,36 @@ from datetime import datetime
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import threading
 import queue
+
+
+def ttl_cache(seconds):
+    """Memoize a zero-arg function for `seconds`, thread-safe.
+
+    Keeps the last good value if a refresh raises, so transient subprocess
+    failures don't blank out the dashboard.
+    """
+    def deco(fn):
+        store = {"t": 0.0, "v": None, "has": False}
+        lock = threading.Lock()
+
+        @functools.wraps(fn)
+        def wrapper():
+            now = time.time()
+            with lock:
+                if store["has"] and now - store["t"] < seconds:
+                    return store["v"]
+            try:
+                val = fn()
+            except Exception:
+                with lock:
+                    if store["has"]:
+                        return store["v"]
+                raise
+            with lock:
+                store.update(t=now, v=val, has=True)
+            return val
+        return wrapper
+    return deco
 
 PORT = 7878
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -39,6 +71,8 @@ ASSETS = {
     "wallpaper": (os.path.join(ASSET_DIR, "hermes-wallpaper.jfif"), "image/jpeg"),
     "logo": (os.path.join(ASSET_DIR, "hermes-logo.PNG"), "image/png"),
     "video": (os.path.join(ASSET_DIR, "lumen-kaleid-3509.webm"), "video/webm"),
+    "avatar-nora": (os.path.join(ASSET_DIR, "avatar-nora-hermes-nora.png"), "image/png"),
+    "avatar-murderszn": (os.path.join(ASSET_DIR, "avatar-murderszn.png"), "image/png"),
 }
 
 TS_RE = re.compile(r"^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})")
@@ -144,7 +178,7 @@ def parse_ts(s):
 
 # ---------------------------------------------------------------- parsers
 
-INBOUND_RE = re.compile(r"inbound message: platform=(\w+) user=(\S+) chat=(\S+) msg=(.*)$")
+INBOUND_RE = re.compile(r"inbound message: platform=(\w+) user=(.+?) chat=(\S+) msg=(.*)$")
 RESP_RE = re.compile(r"response ready: platform=(\w+) chat=(\S+) time=([\d.]+)s api_calls=(\d+) response=(\d+) chars")
 CONNAS_RE = re.compile(r"Connected as (\S+)")
 SEND_RE = re.compile(r"\[Discord\] Sending response \((\d+) chars\)")
@@ -259,6 +293,111 @@ def parse_agent_log():
     }
 
 
+FAH_WORK = r"C:\ProgramData\FAHClient\work"
+
+def _parse_wuinfo(path):
+    try:
+        with open(path, "rb") as f:
+            data = f.read()
+        # first 4 bytes = length, rest = ascii payload
+        ln = int.from_bytes(data[:4], "little")
+        payload = data[4:4 + ln].decode("utf-8", errors="replace")
+    except Exception:
+        return {}
+    # payload looks like "Core27 p1824 6" or "Gromacs p18806"
+    core = ""
+    project = ""
+    slot = ""
+    m = re.search(r"Core\s*(\d+)", payload)
+    if m:
+        core = m.group(1)
+    m = re.search(r"p(\d+)", payload)
+    if m:
+        project = m.group(1)
+    # slot from file suffix? filename is wuinfo_01.dat
+    m = re.search(r"wuinfo_(\d+)\.dat$", path)
+    if m:
+        slot = m.group(1)
+    info = {"core": core, "project": project, "slot": slot}
+    # parse counts after the string
+    rest = data[4 + ln:]
+    # keep device id if present
+    if len(rest) >= 8:
+        info["device"] = int.from_bytes(rest[4:8], "little")
+    return info
+
+
+def parse_fah():
+    try:
+        units = []
+        for name in os.listdir(FAH_WORK):
+            wdir = os.path.join(FAH_WORK, name)
+            if not os.path.isdir(wdir):
+                continue
+            wuinfo = os.path.join(wdir, "wuinfo_01.dat")
+            logfile = os.path.join(wdir, "logfile_01.txt")
+            info = _parse_wuinfo(wuinfo) if os.path.exists(wuinfo) else {}
+            progress = ""
+            total_steps = ""
+            completed_steps = ""
+            if os.path.exists(logfile):
+                try:
+                    with open(logfile, "r", encoding="utf-8", errors="replace") as f:
+                        lines = f.readlines()
+                    for line in lines:
+                        m = re.search(r"Completed\s+(\d+)\s+out\s+of\s+(\d+)\s+steps\s+\((\d+)%\)", line)
+                        if m:
+                            completed_steps = m.group(1)
+                            total_steps = m.group(2)
+                            progress = m.group(3) + "%"
+                except Exception:
+                    pass
+            status = "progressing"
+            if os.path.exists(logfile):
+                try:
+                    tail = ""
+                    with open(logfile, "r", encoding="utf-8", errors="replace") as f:
+                        tail = f.readlines()[-5:]
+                    if any("INTERRUPTED" in l or "Core Shutdown" in l for l in tail):
+                        status = "interrupted"
+                except Exception:
+                    pass
+            units.append({
+                "id": name,
+                "core": info.get("core", ""),
+                "project": info.get("project", ""),
+                "slot": info.get("slot", ""),
+                "device": info.get("device"),
+                "progress": progress,
+                "total_steps": total_steps,
+                "completed_steps": completed_steps,
+                "status": status,
+            })
+        units.sort(key=lambda u: int(u.get("project") or 0), reverse=True)
+        return units[:8]
+    except Exception:
+        return []
+
+
+def parse_unified_messages(chans, msgs_by_id):
+    flat = []
+    for ch in chans:
+        cid = ch.get("id", "")
+        msgs = msgs_by_id.get(cid, [])
+        for m in msgs:
+            flat.append({
+                "ts": m.get("ts") or "",
+                "type": m.get("type", "in"),
+                "user": m.get("user", ""),
+                "text": m.get("text", ""),
+                "source": ch.get("platform", "discord"),
+                "channel_id": cid,
+                "channel_name": ch.get("name", cid),
+            })
+    flat.sort(key=lambda x: x.get("ts") or "", reverse=True)
+    return flat[:120]
+
+
 ERR_RE = re.compile(r"^(\d{4}-\d{2}-\d{2} [\d:,]+)\s+(WARNING|ERROR|CRITICAL)\b\s*(?:\[[^\]]*\])?\s*([\w.]+)?:?\s*(.*)$")
 
 
@@ -292,12 +431,35 @@ def parse_watchdog():
     return {"restarts": restarts, "last_restart": last}
 
 
+def parse_moltbook_activity():
+    path = os.path.expanduser("~/.config/moltbook/engagement_activity.jsonl")
+    items = []
+    try:
+        with open(path, "r", encoding="utf-8", errors="replace") as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    obj = json.loads(line)
+                    obj["ts"] = obj.get("ts", "")
+                    items.append(obj)
+                except Exception:
+                    continue
+    except Exception:
+        pass
+    items.sort(key=lambda x: x.get("ts") or "", reverse=True)
+    return items[:60]
+
+
 def parse_channels():
     cj = load_json(CHANNEL_DIR)
-    disc = (cj.get("platforms") or {}).get("discord") or []
+    platforms = (cj.get("platforms") or {})
+    disc = (platforms.get("discord") or [])
+    email = (platforms.get("email") or [])
     by_type = {}
     items = []
-    log_map = {}  # track events from richer gateway parse if we add it
+    log_map = {}
     for ch in disc:
         t = ch.get("type", "?")
         by_type[t] = by_type.get(t, 0) + 1
@@ -306,16 +468,13 @@ def parse_channels():
         cid = ch.get("id", "")
         topic = ""
         parent = ""
-        # thread names like ".../#general / prompt / topic 123"
         if t == "thread" and "/" in name:
             parts = [p.strip() for p in name.split("/")]
             if len(parts) >= 3:
                 parent = parts[1] if parts[1].startswith("#") else ""
-                # prompt is usually parts[2]
                 topic = parts[2] if len(parts) > 2 else ""
             else:
                 topic = name
-            # drop leading/trailing repeated topic ids
             topic = re.sub(r"(/topic\s*[\w:]+)+$", "", topic, flags=re.I).strip()
             display = topic[:80] if topic else name[:80]
         else:
@@ -329,11 +488,29 @@ def parse_channels():
             "topic": topic,
             "last_ts": "",
             "preview": "",
+            "platform": "discord",
         })
-    return {"by_type": by_type, "total": len(disc), "items": items[:20],
+    for ch in email:
+        t = ch.get("type", "dm")
+        by_type[t] = by_type.get(t, 0) + 1
+        cid = ch.get("id", "")
+        display = ch.get("name", cid)
+        items.append({
+            "id": cid,
+            "type": t,
+            "name": display,
+            "guild": "",
+            "parent": "",
+            "topic": "",
+            "last_ts": "",
+            "preview": "",
+            "platform": "email",
+        })
+    return {"by_type": by_type, "total": len(items), "items": items,
             "updated": cj.get("updated_at"), "log_map": log_map}
 
 
+@ttl_cache(30)  # scheduled-task status barely changes; schtasks spawn is slow
 def watchdog_task_state():
     try:
         out = subprocess.run(
@@ -348,6 +525,136 @@ def watchdog_task_state():
         return {"present": False, "status": "?", "next_run": "?"}
 
 
+# ---------------------------------------------------------------- system stats
+
+@ttl_cache(4)
+def get_cpu_usage():
+    try:
+        out = subprocess.run(
+            ["wmic", "cpu", "get", "loadpercentage", "/format:list"],
+            capture_output=True, text=True, timeout=5,
+        ).stdout
+        for line in out.splitlines():
+            if "=" in line:
+                _, val = line.split("=", 1)
+                if val.strip().isdigit():
+                    return int(val.strip())
+    except Exception:
+        pass
+    return None
+
+
+@ttl_cache(4)
+def get_gpu_usage():
+    try:
+        out = subprocess.run(
+            ["nvidia-smi", "--query-gpu=utilization.gpu,memory.used,memory.total,temperature.gpu",
+             "--format=csv,noheader,nounits"],
+            capture_output=True, text=True, timeout=5,
+        ).stdout.strip()
+        if not out:
+            return None
+        parts = [p.strip() for p in out.split(",")]
+        return {
+            "usage": int(parts[0]) if parts[0].isdigit() else None,
+            "mem_used": int(parts[1]) if parts[1].isdigit() else None,
+            "mem_total": int(parts[2]) if parts[2].isdigit() else None,
+            "temp": int(parts[3]) if parts[3].isdigit() else None,
+        }
+    except Exception:
+        return None
+
+
+@ttl_cache(4)
+def get_ram_usage():
+    try:
+        out = subprocess.run(
+            ["wmic", "OS", "get", "FreePhysicalMemory,TotalVisibleMemorySize", "/format:list"],
+            capture_output=True, text=True, timeout=5,
+        ).stdout
+        vals = {}
+        for line in out.splitlines():
+            if "=" in line:
+                k, v = line.split("=", 1)
+                vals[k.strip()] = int(v.strip()) if v.strip().isdigit() else 0
+        total = vals.get("TotalVisibleMemorySize", 0)
+        free = vals.get("FreePhysicalMemory", 0)
+        if total:
+            return {
+                "total_mb": round(total / 1024),
+                "used_mb": round((total - free) / 1024),
+                "pct": round((total - free) * 100 / total),
+            }
+    except Exception:
+        pass
+    return None
+
+
+def get_disk_usage(path="C:\\"):
+    try:
+        usage = shutil.disk_usage(path)
+        label = path.rstrip("\\").rstrip("/").upper()
+        return {
+            "pct": round(usage.used * 100 / usage.total) if usage.total else 0,
+            "label": label,
+            "used_gb": round(usage.used / (1024**3)),
+            "total_gb": round(usage.total / (1024**3)),
+        }
+    except Exception:
+        pass
+    return None
+
+
+@ttl_cache(4)
+def get_all_disks():
+    drives = []
+    for prefix in ("C", "D", "G"):
+        d = get_disk_usage(f"{prefix}:\\")
+        if d:
+            drives.append(d)
+    return drives
+
+
+def _ps(cmd):
+    try:
+        out = subprocess.run(cmd, shell=True, capture_output=True, text=True, check=False).stdout.strip()
+        return out
+    except Exception:
+        return ""
+
+
+@ttl_cache(600)  # static inventory (CPU/GPU names, RAM part #s, disk models) — never changes
+def get_hardware_detail():
+    try:
+        cpu = _ps("powershell -NoProfile -Command \"(Get-CimInstance Win32_Processor).Name\"")
+        gpu_raw = _ps("powershell -NoProfile -Command \"Get-CimInstance Win32_VideoController | Select-Object -Expand Name\"")
+        gpus = [x.strip() for x in gpu_raw.splitlines() if x.strip()] if gpu_raw else []
+        ram_raw = _ps("powershell -NoProfile -Command \"Get-CimInstance Win32_PhysicalMemory | Select-Object Manufacturer, PartNumber, SerialNumber, Capacity | ConvertTo-Json\"")
+        ram = []
+        try:
+            ram = json.loads(ram_raw)
+            if isinstance(ram, dict):
+                ram = [ram]
+        except Exception:
+            ram = []
+        disk_raw = _ps("powershell -NoProfile -Command \"Get-CimInstance Win32_DiskDrive | Select-Object Model, Size, InterfaceType, MediaType | ConvertTo-Json\"")
+        disks = []
+        try:
+            disks = json.loads(disk_raw)
+            if isinstance(disks, dict):
+                disks = [disks]
+        except Exception:
+            disks = []
+        return {
+            "cpu": cpu,
+            "gpus": gpus,
+            "ram": ram,
+            "disks": disks,
+        }
+    except Exception:
+        return {}
+
+
 # ---------------------------------------------------------------- aggregate
 
 def build_state():
@@ -359,6 +666,8 @@ def build_state():
     wd = parse_watchdog()
     chans = parse_channels()
     task = watchdog_task_state()
+    molt = parse_moltbook_activity()
+    fah = parse_fah()
 
     # map canonical channel ids (from channel_dir) to log chat keys
     ch_key_map = {}
@@ -408,6 +717,8 @@ def build_state():
         if dt:
             last_ago = humanize_ago(dt)
 
+    unified = parse_unified_messages(chans["items"], msgs_by_id)
+
     return {
         "server_time": datetime.now().strftime("%H:%M:%S"),
         "server_date": datetime.now().strftime("%a %d %b %Y"),
@@ -434,6 +745,20 @@ def build_state():
         "errors": errs,
         "watchdog": {**wd, "task": task},
         "activity": feed,
+        "moltbook": {"activity": molt},
+        "fah": fah,
+        "unified_messages": unified,
+        "hardware_detail": get_hardware_detail(),
+        "avatars": {
+            "nora": "/assets/avatar-nora",
+            "murderszn": "/assets/avatar-murderszn",
+        },
+        "hardware": {
+            "cpu": get_cpu_usage(),
+            "gpu": get_gpu_usage(),
+            "ram": get_ram_usage(),
+            "disks": get_all_disks(),
+        },
     }
 
 
@@ -456,10 +781,36 @@ class Handler(BaseHTTPRequestHandler):
         path = self.path.split("?")[0]
         try:
             if path == "/" or path == "/index.html":
-                with open(os.path.join(HERE, "index.html"), "rb") as f:
-                    self._send(200, f.read(), "text/html; charset=utf-8")
+                body = open(os.path.join(HERE, "index.html"), "rb").read()
+                self._send(200, body, "text/html; charset=utf-8", cache=False)
             elif path == "/api/state":
                 self._send(200, json.dumps(build_state()).encode("utf-8"))
+            elif path == "/api/logs/activity":
+                state = build_state()
+                lines = []
+                for e in state.get("activity", []):
+                    who = "nora" if e.get("type") == "out" else (e.get("user") or "user")
+                    ts = e.get("ts") or ""
+                    lines.append(f"[{ts}] {who}: {e.get('text','')}")
+                body = "\n".join(lines).encode("utf-8")
+                self._send(200, body, "text/plain; charset=utf-8", cache=False)
+            elif path == "/api/logs/diagnostics":
+                try:
+                    state = build_state()
+                    lines = []
+                    errs = state.get("errors") or {}
+                    if isinstance(errs, dict):
+                        for e in errs.get("recent", []):
+                            ts = e.get("ts") or ""
+                            lines.append(f"[{ts}] {e.get('level','')}: {e.get('text','')}")
+                    elif isinstance(errs, list):
+                        for e in errs:
+                            if isinstance(e, dict):
+                                lines.append(f"[{e.get('ts','')}] {e.get('level','')}: {e.get('text','')}")
+                    body = "\n".join(lines).encode("utf-8")
+                    self._send(200, body, "text/plain; charset=utf-8", cache=False)
+                except Exception as e:
+                    self._send(500, str(e).encode("utf-8"), "text/plain; charset=utf-8")
             elif path.startswith("/assets/"):
                 key = path[len("/assets/"):]
                 if key in ASSETS:
@@ -511,6 +862,22 @@ class Handler(BaseHTTPRequestHandler):
                 self._send(202, json.dumps({"queued": True, "pid": proc.pid}).encode())
             except Exception as e:
                 self._send(500, json.dumps({"error": str(e)}).encode())
+        elif path == "/api/fah/pause":
+            try:
+                subprocess.run(["taskkill", "/F", "/IM", "FAHClient.exe"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                time.sleep(1)
+                subprocess.Popen([r"C:\Program Files\FAHClient\FAHClient.exe", "--cpus", "0"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, shell=False)
+                self._send(202, json.dumps({"ok": True}).encode())
+            except Exception as e:
+                self._send(500, json.dumps({"error": str(e)}).encode())
+        elif path == "/api/fah/unpause":
+            try:
+                subprocess.run(["taskkill", "/F", "/IM", "FAHClient.exe"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                time.sleep(1)
+                subprocess.Popen([r"C:\Program Files\FAHClient\FAHClient.exe", "--cpus", "15"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, shell=False)
+                self._send(202, json.dumps({"ok": True}).encode())
+            except Exception as e:
+                self._send(500, json.dumps({"error": str(e)}).encode())
         else:
             self._send(404, b"not found")
 
@@ -543,7 +910,7 @@ def main():
 
     srv = ThreadingHTTPServer(("127.0.0.1", PORT), Handler)
     print("=" * 52)
-    print("  HERMES :: Agent Control Dashboard")
+    print("  HERMES — NORA :: Agent Control Dashboard")
     print(f"  Live at  {url}")
     print("  Press Ctrl+C to stop")
     print("=" * 52)

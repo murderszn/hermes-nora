@@ -1,57 +1,45 @@
-# Hermes-Nora
+# Hermes Dashboard — Nora Control Interface
 
-![Repo size](https://img.shields.io/github/repo-size/murderszn/Hermes-Nora)
-![Last commit](https://img.shields.io/github/last-commit/murderszn/Hermes-Nora)
-![License: Unlicense](https://img.shields.io/badge/License-Unlicense-blue.svg)
+Standalone JARVIS-style local dashboard for the Hermes Agent runtime.  
+Served at `http://127.0.0.1:7878` by `dashboard.py` (Python stdlib only).
 
-Local setup of [Hermes Agent](https://hermes-agent.nousresearch.com/) named **Nora**, bound to Discord, with a custom JARVIS-style control dashboard.
+## Launch
 
-## Dashboard preview
+- **Launcher:** `Hermes Dashboard.bat` (root of this folder)
+- **Server:** `dashboard.py`
+- **Port:** 7878
+- **Browser:** Chrome or Edge recommended
 
-![Hermes dashboard wallpaper](dashboard/assets/hermes-wallpaper.jfif)
+## Data Sources
 
-## Layout
+Reads directly from the Hermes runtime at `C:/Users/jjohn/AppData/Local/hermes/`:
+- `logs/gateway.log` — gateway events
+- `logs/agent.log` — agent activity
+- `logs/errors.log` — error stream
+- `gateway_state.json` — live runtime state
+- `channel_directory.json` — channel/thread routing
 
-```text
-hermes-nora/
-├── dashboard/        # HTML + Python dashboard served on 127.0.0.1:7878
-│   ├── index.html
-│   ├── dashboard.py
-│   ├── hermes.ico
-│   └── assets/
-│       └── hermes-wallpaper.jfif
-├── hermes/           # Sanitized local Hermes config / state snapshots
-│   ├── config.yaml
-│   ├── channel_directory.json
-│   ├── gateway_state.json
-│   ├── processes.json
-│   ├── discord_threads.json
-│   ├── auth.json           # tokens are masked (***)
-│   ├── .env                # secrets are masked (***)
-│   └── SOUL.md
-├── skills/           # Custom Hermes skills derived from operator learnings
-├── learnings/        # Daily diagnostics and improvement notes
-│   └── 2026-06-27-diagnostics-and-learnings.md
-└── README.md
-```
+## Layout (1080p no-scroll)
 
-> Large runtime data (`state.db`, `bin/`, model caches) are excluded on purpose.
+| Area | Height | Contents |
+|------|--------|----------|
+| Hero / Banner | 25vh | Agent name, clock, live status, PID, agents |
+| R1 | 11.5vh | Watchdog (left) + Discord Uplink (right) |
+| R2 | 21vh | Neural Core + Channels (left) / Diagnostics (right) |
+| R3 | 42.5vh | Messages (left) + Live Activity Stream (right) |
 
-## Run
+Panel rows are 50/50 width splits. Inner lists scroll independently.
 
-1. Install Hermes Agent (`hermes setup`).
-2. Start the gateway and Discord bridge if not already running.
-3. Launch the dashboard:
-   - `scripts/Hermes Dashboard.bat`
-   - Opens `http://127.0.0.1:7878`
+## Customization
 
-## Config notes
+See the `hermes-dashboard` skill for:
+- UI/UX rules and CSS class conventions
+- Panel row structure
+- Channel sidebar behavior
+- Slack-like thread rendering
 
-- Dashboard source of truth: `dashboard/index.html` + `dashboard/dashboard.py`.
-- Hermes runtime state: `C:\Users\jjohn\AppData\Local\hermes\`.
-- The dashboard polls `/api/state` every 5 seconds.
-- Secrets in `hermes/.env` and `hermes/auth.json` are redacted before commit.
+## Notes
 
-## Learnings
-
-See [`learnings/2026-06-27-diagnostics-and-learnings.md`](learnings/2026-06-27-diagnostics-and-learnings.md) for a categorical diagnosis of today’s warnings/errors, proposed skills, and correction items.
+- No voice UI button in the hero (removed by request).
+- Fullscreen toggle via `F` or `Esc`; button hides itself automatically.
+- Auto-opens the latest channel thread on load.

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HERMES :: Agent Control</title>
+<title>HERMES — NORA :: Agent Control</title>
 <style>
   :root{
     --deep:#001570; --deep2:#00093f; --ink:#000620;
@@ -35,14 +35,14 @@
   /* ---- fullscreen btn ---- */
   #fsBtn{position:fixed;top:16px;right:18px;z-index:80;cursor:pointer;
     font-family:inherit;font-size:.64rem;letter-spacing:2px;color:var(--ice);
-    background:rgba(10,30,90,.5);border:1px solid var(--line);border-radius:8px;
-    padding:7px 12px;backdrop-filter:blur(6px);transition:.2s}
+    background:rgba(10,30,90,.5);border:1px solid var(--ice);border-radius:999px;
+    padding:7px 14px;backdrop-filter:blur(6px);transition:.2s}
   #fsBtn:hover{background:rgba(40,90,200,.5);color:#fff;box-shadow:0 0 14px rgba(95,208,255,.4)}
 
   main{position:relative;z-index:2;width:100%;max-width:1400px;margin:0 auto;
     padding:10px 16px 6px;display:grid;
     grid-template-columns:1fr;
-    grid-template-rows:25vh 11.5vh 21vh calc(42.5vh - 24px);
+    grid-template-rows:25vh 13.5vh minmax(0,21vh) minmax(0,1fr);
     grid-template-areas:
       "hero"
       "r1"
@@ -59,9 +59,16 @@
 
   .chDiagRow{display:grid;grid-template-columns:1fr 1fr;gap:6px;align-items:stretch;overflow:hidden}
   .msgLiveRow{display:grid;grid-template-columns:1fr 1fr;gap:6px;align-items:stretch;overflow:hidden}
-  .chDiagRow>.panel, .msgLiveRow>.panel{height:100%;min-height:0;overflow:hidden}
-  .chDiagRow [style*="grid-template-rows"], .chDiagRow [style*="grid-template-rows"]>.panel{height:100%;min-height:0;overflow:hidden}
-
+  .msgLiveRow>.panel{height:100%;min-height:0;overflow:hidden;display:flex;flex-direction:column}
+  .fahtoggle button{background:transparent;border:1px solid var(--ice);color:var(--ice);padding:2px 10px;font-size:.6rem;border-radius:999px;cursor:pointer;margin-left:4px}
+  .fahtoggle button.active{background:var(--ice);color:#000}
+  .fahrow{display:flex;justify-content:space-between;gap:8px;padding:5px 6px;font-size:.72rem;align-items:center;border-bottom:1px solid rgba(255,255,255,.03)}
+  .fahrow .ico{width:20px;text-align:center;flex-shrink:0}
+  .fahrow .lbl{color:var(--txt);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .fahrow .det{color:var(--muted);font-size:.65rem;white-space:nowrap;flex-shrink:0}
+  .fahrow .tm{color:var(--ice);font-size:.62rem;white-space:nowrap;opacity:.9;flex-shrink:0;margin-left:6px}
+  .fahrow .bar{width:50px;height:6px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden;flex-shrink:0;margin-left:8px}
+  .fahrow .bar span{display:block;height:100%;background:var(--ice);border-radius:3px}
   @media (max-width: 1000px){
     .grid2, .chDiagRow, .msgLiveRow{grid-template-columns:1fr}
   }
@@ -69,7 +76,7 @@
   @media (max-width: 900px){
     main{
       grid-template-columns:1fr;
-      grid-template-rows:25vh 11.5vh 21vh calc(42.5vh - 24px);
+      grid-template-rows:25vh 13.5vh minmax(0,21vh) minmax(0,1fr);
       grid-template-areas:
         "hero"
         "r1"
@@ -83,34 +90,41 @@
   .hero{grid-area:hero;position:relative;border-radius:14px;overflow:hidden;flex:0 1 auto;
     height:100%;min-height:0;max-height:none;
     border:1px solid rgba(150,200,255,.35);
-    box-shadow:0 0 46px rgba(95,208,255,.28), inset 0 0 50px rgba(0,18,80,.45);}
+    box-shadow:0 0 46px rgba(95,208,255,.28);}
   .hero img{display:block;width:100%;height:100%;object-fit:cover;object-position:62% 32%}
-  .hero .vig{position:absolute;inset:0;pointer-events:none;
-    background:linear-gradient(180deg, rgba(0,8,40,.25) 0%, transparent 22%, transparent 62%, rgba(0,6,30,.85) 100%);}
+  .hero .vig{position:absolute;inset:0;pointer-events:none;background:none;}
   .hero::before,.hero::after{content:'';position:absolute;width:22px;height:22px;border:2px solid var(--cyan);z-index:3;opacity:.9}
   .hero::before{top:9px;left:9px;border-right:0;border-bottom:0}
   .hero::after{bottom:9px;right:9px;border-left:0;border-top:0}
-  .heronav{position:absolute;left:0;right:0;top:0;z-index:4;display:flex;align-items:center;justify-content:space-between;
-    gap:14px;padding:12px 16px;font-size:.66rem;letter-spacing:1px;white-space:nowrap;
-    background:linear-gradient(180deg, rgba(0,8,38,.88), rgba(0,8,38,.35) 70%, transparent)}
-  .heronav .title h1{margin:0;font-size:1.35rem;letter-spacing:4px}
-  .heronav .title p{margin:1px 0 0;font-size:.58rem;letter-spacing:2px;color:var(--muted)}
-  .heronav .clock{text-align:right;margin-left:auto}
-  .heronav .clock .t{font-size:1.35rem;font-weight:800;color:#fff;letter-spacing:2px}
-  .heronav .clock .d{font-size:.62rem;color:var(--muted);letter-spacing:1.5px}
-  .heronav .live{display:inline-flex;align-items:center;gap:7px;font-size:.6rem;letter-spacing:2px;color:var(--green);margin-top:3px}
-  .heronav .live .dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green);animation:pulse 1.6s infinite}
-  .heronav .live.stale{color:var(--amber)} .heronav .live.stale .dot{background:var(--amber);box-shadow:0 0 10px var(--amber)}
+  .hero-stats{position:absolute;left:0;right:50%;top:50%;transform:translateY(-50%);z-index:4;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;padding:0;width:auto;max-width:72%;margin-left:16px}
+  .stat-card{background:transparent;border:none;border-radius:0;padding:8px 8px;min-width:130px;max-width:180px;text-align:center;backdrop-filter:none;box-shadow:none;display:flex;flex-direction:column;justify-content:center;align-items:center}
+  .stat-card .lbl{font-size:.5rem;letter-spacing:2.5px;color:#fff;text-transform:uppercase;margin-bottom:2px}
+  .stat-card .val{font-size:1.35rem;font-weight:800;color:#fff;letter-spacing:1px}
+  .stat-card .sub{font-size:.44rem;color:rgba(255,255,255,.75);letter-spacing:1px;margin-top:1px}
+  .stat-card.warn .val{color:var(--amber)}
+  .stat-card.crit .val{color:var(--red)}
+  .heronav{position:absolute;left:0;right:50%;top:46px;z-index:4;display:flex;flex-direction:column;align-items:center;gap:4px;padding:0 16px;font-size:.6rem;letter-spacing:1px;white-space:nowrap}
+  .heronav .title{text-align:center}
+  .heronav .title h1{margin:0;font-size:1.45rem;letter-spacing:4px;font-weight:800;color:#fff;text-shadow:0 0 14px rgba(95,208,255,.5)}
+  .heronav .title p{margin:2px 0 0;font-size:.58rem;letter-spacing:2px;color:var(--muted)}
+  .heronav .status{display:inline-flex;align-items:center;gap:12px;flex-wrap:wrap;justify-content:center}
+  .heronav .status .d{font-size:.62rem;color:var(--muted);letter-spacing:1.5px}
+  .heronav .status .t{font-size:.9rem;font-weight:700;color:#fff;letter-spacing:2px}
+  .heronav .live{display:inline-flex;align-items:center;gap:5px;font-size:.54rem;letter-spacing:2px;color:var(--green)}
+  .heronav .live .dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 1.6s infinite}
+  .heronav .live.stale{color:var(--amber)} .heronav .live.stale .dot{background:var(--amber);box-shadow:0 0 8px var(--amber)}
   .herobar{position:absolute;left:0;right:0;bottom:0;z-index:4;display:flex;align-items:center;
     gap:10px;padding:11px 16px;font-size:.66rem;letter-spacing:1px;white-space:nowrap;overflow:hidden;
-    background:linear-gradient(0deg, rgba(0,8,38,.92), rgba(0,8,38,.4) 60%, transparent);}
+    background:none;}
   .herobar b{color:#fff;font-weight:700}
   .herobar .pill{display:inline-flex;align-items:center;gap:7px;font-weight:700;letter-spacing:2px}
   .herobar .pdot{width:9px;height:9px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green);animation:pulse 1.6s infinite}
   .herobar .pdot.off{background:var(--red);box-shadow:0 0 10px var(--red)}
   .herobar .sep{color:var(--muted)}
   .herobar .hb{color:var(--ice)}
-  .herobar .right{margin-left:auto;color:var(--muted);letter-spacing:2px}
+  .herobar .right{margin-left:auto;color:var(--ice);letter-spacing:2px;text-shadow:0 1px 6px rgba(0,4,24,.9)}
+  .dl{color:var(--muted);text-decoration:none;font-size:.65rem;margin-left:6px;opacity:.7}
+  .dl:hover{color:#fff;opacity:1}
 
   /* ---- panels ---- */
   .panel{position:relative;background:rgba(0,12,58,.5);border:1px solid var(--line);
@@ -150,7 +164,7 @@
 
   .panel.tall{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;overflow:hidden}
   .msgboard{flex:1 1 auto;min-height:0;overflow-y:auto;padding-right:4px}
-  .feed{display:flex;flex-direction:column;gap:6px;overflow-y:auto;padding-right:4px}
+  .feed{display:flex;flex-direction:column;gap:6px;overflow-y:auto;padding-right:4px;flex:1 1 auto;min-height:0}
   .ev{display:flex;gap:9px;align-items:flex-start;font-size:.74rem;padding:6px 9px;
     background:rgba(95,208,255,.04);border-left:2px solid rgba(95,208,255,.4);border-radius:6px;animation:flash .6s ease}
   @keyframes flash{from{background:rgba(95,208,255,.22)}to{background:rgba(95,208,255,.04)}}
@@ -168,7 +182,8 @@
   .msg{display:flex;gap:10px;align-items:flex-start;padding:6px 10px;border-radius:8px;transition:.15s}
   .msg:hover{background:rgba(95,208,255,.06)}
   .msg .avatar{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;
-    font-weight:800;font-size:.78rem;flex-shrink:0;border:1px solid var(--line)}
+    font-weight:800;font-size:.78rem;flex-shrink:0;border:1px solid var(--line);overflow:hidden;background:transparent}
+  .msg .avatar img{width:100%;height:100%;object-fit:cover;display:block}
   .msg .meta{font-size:.58rem;color:var(--muted);letter-spacing:1px;margin-top:4px;display:flex;gap:8px;align-items:center}
   .msg .name{font-weight:700;font-size:.82rem;color:#fff}
   .msg .name-in{color:var(--cyan)}
@@ -184,8 +199,17 @@
   .err .lv{font-weight:700;color:var(--amber)} .err.ERROR .lv,.err.CRITICAL .lv{color:var(--red)}
   .err .mg{color:var(--muted);display:block;margin-top:2px}
   .diaglist{flex:1 1 auto;min-height:0;max-height:100%;overflow-y:auto;padding-right:4px}
+  .oprow{display:flex;justify-content:space-between;gap:8px;padding:4px 6px;font-size:.72rem;align-items:center}
+  .oprow .ico{width:18px;text-align:center;flex-shrink:0}
+  .oprow .lbl{color:var(--txt);flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .oprow .det{color:var(--muted);font-size:.65rem;white-space:nowrap;flex-shrink:0}
+  .oprow .tm{color:var(--ice);font-size:.62rem;white-space:nowrap;opacity:.9;flex-shrink:0;margin-left:6px}
 
   .muted{color:var(--muted);font-size:.74rem;text-align:center;padding:12px 0}
+  .hwrow{display:flex;justify-content:space-between;gap:10px;padding:4px 0;font-size:.72rem;align-items:flex-start;border-bottom:1px dashed rgba(150,200,255,.12)}
+  .hwrow:last-child{border-bottom:0}
+  .hwrow .lab{color:var(--muted);min-width:90px;flex-shrink:0}
+  .hwrow .val{color:#fff;font-weight:600;text-align:right;word-break:break-word}
   ::-webkit-scrollbar{width:6px}
   ::-webkit-scrollbar-thumb{background:rgba(95,208,255,.35);border-radius:6px}
 
@@ -205,23 +229,58 @@
 
       <div class="heronav">
         <div class="title">
-          <h1 style="margin:0;font-size:1.35rem;letter-spacing:4px">HERMES — NORA</h1>
-          <p style="margin:1px 0 0;font-size:.58rem;letter-spacing:2px;color:var(--muted)">Autonomous Agent · Control Interface</p>
-        </div>
-        <div class="clock">
-          <div class="t" id="clock">--:--:--</div>
-          <div class="d" id="date">—</div>
-          <div class="live" id="live"><span class="dot"></span><span id="livetxt">CONNECTING</span></div>
+          <h1>HERMES — NORA</h1>
+          <p>Autonomous Agent · Control Interface</p>
+          <div class="status">
+            <div class="d" id="date">—</div>
+            <div class="t" id="clock">--:--:--</div>
+            <div class="live" id="live"><span class="dot"></span><span id="livetxt">CONNECTING</span></div>
+          </div>
         </div>
       </div>
 
+      <div class="hero-stats" id="heroStats">
+        <div class="stat-card">
+          <div class="lbl">CPU</div>
+          <div class="val" id="hCpu">--%</div>
+          <canvas id="sparkCpu" width="120" height="28"></canvas>
+          <div class="sub" id="hCpuSub"></div>
+        </div>
+        <div class="stat-card">
+          <div class="lbl">GPU</div>
+          <div class="val" id="hGpu">--%</div>
+          <canvas id="sparkGpu" width="120" height="28"></canvas>
+          <div class="sub" id="hGpuSub"></div>
+        </div>
+        <div class="stat-card">
+          <div class="lbl">RAM</div>
+          <div class="val" id="hRam">--%</div>
+          <canvas id="sparkRam" width="120" height="28"></canvas>
+          <div class="sub" id="hRamSub"></div>
+        </div>
+        <div class="stat-card">
+          <div class="lbl">C:</div>
+          <div class="val" id="hDisk0">--%</div>
+          <canvas id="sparkDisk0" width="120" height="28"></canvas>
+          <div class="sub" id="hDisk0Sub"></div>
+        </div>
+        <div class="stat-card">
+          <div class="lbl">D:</div>
+          <div class="val" id="hDisk1">--%</div>
+          <canvas id="sparkDisk1" width="120" height="28"></canvas>
+          <div class="sub" id="hDisk1Sub"></div>
+        </div>
+        <div class="stat-card">
+          <div class="lbl">G:</div>
+          <div class="val" id="hDisk2">--%</div>
+          <canvas id="sparkDisk2" width="120" height="28"></canvas>
+          <div class="sub" id="hDisk2Sub"></div>
+        </div>
+      </div>
+      <div style="position:absolute;left:0;right:50%;bottom:8px;text-align:center;font-size:.68rem;letter-spacing:1px;color:var(--txt);line-height:1.4;padding:0 16px 2.8rem 16px">
+        <span id="sysLine"></span>
+      </div>
       <div class="herobar">
-        <span class="pill"><span class="pdot" id="heroDot"></span><span id="heroState">INITIALIZING</span></span>
-        <span class="sep">·</span><span class="hb" id="heroBot">—</span>
-        <span class="sep">·</span><span class="hb">PID&nbsp;<b id="kPid">—</b></span>
-        <span class="sep">·</span><span class="hb"><b id="kAgents">0</b>&nbsp;AGENTS</span>
-        <span class="sep">·</span><span class="hb"><b id="kState">—</b></span>
-        <span class="sep">·</span><span class="hb"><b id="kLast">—</b></span>
         <span class="right" id="heroRight">AGENT PORTAL</span>
       </div>
     </div>
@@ -233,6 +292,10 @@
         <div class="row"><span class="lab">Schedule</span><span class="val" id="wNext">—</span></div>
         <div class="row"><span class="lab">Restarts</span><span class="val" id="wCount">0</span></div>
         <div class="row"><span class="lab">Last restart</span><span class="val" id="wLast">—</span></div>
+        <div class="row"><span class="lab">PID</span><span class="val" id="kPid">—</span></div>
+        <div class="row"><span class="lab">Agents</span><span class="val" id="kAgents">0</span></div>
+        <div class="row"><span class="lab">State</span><span class="val" id="kState">—</span></div>
+        <div class="row"><span class="lab">Last activity</span><span class="val" id="kLast">—</span></div>
       </div>
       <div class="panel">
         <h2>Discord Uplink<span class="bar"></span></h2>
@@ -246,7 +309,7 @@
     </div>
 
     <div class="chDiagRow">
-      <div style="display:grid;grid-template-rows:1fr 1fr;gap:6px;height:100%">
+      <div style="display:grid;grid-template-rows:auto minmax(0,1fr);gap:6px;height:100%;min-height:0;overflow:hidden">
         <div class="panel">
           <h2>Neural Core<span class="bar"></span></h2>
           <div class="row"><span class="lab">Model</span><span class="val" id="aModel">—</span></div>
@@ -257,27 +320,42 @@
           <div class="row"><span class="lab">Tool runs</span><span class="val" id="aTools">0</span></div>
         </div>
         <div class="panel grow">
-          <h2>Channels <span class="sm" id="chCount"></span><span class="bar"></span></h2>
-          <div class="chwrap" id="chWrap"><div class="muted">loading…</div></div>
+          <h2>Folding@home <span class="sm" id="fahCount"></span><span class="bar"></span>
+            <span class="fahtoggle" style="margin-left:6px">
+              <button id="fahPause">PAUSE</button>
+              <button id="fahResume">UNPAUSE</button>
+            </span>
+          </h2>
+          <div class="chwrap" id="fahWrap"><div class="muted">loading…</div></div>
         </div>
       </div>
-      <div class="panel">
-        <h2>Diagnostics <span class="sm" id="eCount"></span><span class="bar"></span></h2>
+      <div class="panel grow">
+        <h2>Diagnostics <span class="sm" id="eCount"></span><span class="bar"></span>
+          <a class="dl" href="/api/logs/diagnostics" download="diagnostics.txt" title="Download diagnostics log">⬇</a>
+        </h2>
         <div class="diaglist" id="errList"><div class="muted">no issues</div></div>
       </div>
     </div>
 
-    <div class="msgLiveRow">
-      <div class="panel tall">
-        <h2>Messages <span class="sm" id="msgCount"></span><span class="bar"></span></h2>
-        <div class="msgboard" id="msgBoard"><div class="muted">select a channel</div></div>
-      </div>
-      <div class="panel grow">
-        <h2>Live Activity Stream<span class="bar"></span></h2>
+    <div class="msgLiveRow" style="display:grid;grid-template-columns:1fr 1fr;gap:6px;height:100%;min-height:0;overflow:hidden">
+      <div class="panel">
+        <h2>Live Activity Stream<span class="bar"></span>
+          <a class="dl" href="/api/logs/activity" download="activity.txt" title="Download activity log" style="margin-left:6px">⬇</a>
+        </h2>
         <div class="feed" id="feed"><div class="muted">awaiting telemetry…</div></div>
       </div>
+      <div class="panel">
+        <h2>Messages <span class="sm" id="msgCount"></span><span class="bar"></span>
+          <span class="fahtoggle" id="msgToggle" style="margin-left:8px">
+            <button data-src="all" class="active">All</button>
+            <button data-src="discord">Discord</button>
+            <button data-src="email">Email</button>
+          </span>
+        </h2>
+        <div class="msgboard" id="msgBoard"><div class="muted">loading…</div></div>
+      </div>
     </div>
-  </main>
+</main>
 
 <script>
 const $=id=>document.getElementById(id);
@@ -304,7 +382,8 @@ function hm(ts){return ts?ts.slice(11,16):"";}
 function esc(s){return (s==null?"":String(s)).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
 function fmt(n){return (n||0).toLocaleString();}
 
-let selectedChannel=null;
+let selectedSource = 'all';
+let lastState = null;
 
 async function refresh(){
   let s;
@@ -313,11 +392,9 @@ async function refresh(){
   setLive(true);
   $("date").textContent=s.server_date;
 
+
   const on=s.system.gateway_online;
   // hero status bar
-  $("heroState").textContent=on?"AGENT ONLINE":"AGENT OFFLINE";
-  $("heroDot").className="pdot"+(on?"":" off");
-  $("heroBot").textContent=(s.discord.bot||"hermes")+"  ·  "+s.discord.state.toUpperCase();
   $("heroRight").textContent=(s.agent.model||"idle");
 
   $("kAgents").textContent=s.system.active_agents;
@@ -333,6 +410,9 @@ async function refresh(){
   $("dAvg").textContent=s.discord.avg_response!=null?s.discord.avg_response+"s":"—";
   const lr=s.discord.last_response;
   $("dLast").textContent=lr?(lr.chars+" chars · "+lr.time+"s"):"—";
+
+  updateHardware(s);
+  renderSysLine(s);
 
   $("aModel").textContent=s.agent.model||"idle";
   $("aProv").textContent=s.agent.provider||"—";
@@ -355,133 +435,246 @@ async function refresh(){
     `<div class="err ${e.level}"><span class="lv">${e.level}</span> ${esc(e.logger)}<span class="mg">${esc(e.text)}</span></div>`).join("")
     : '<div class="muted">no issues</div>';
 
-  $("chCount").textContent=s.channels.total;
-  $("msgCount").textContent=(s.agent.recent_tools||[]).length+" tools logged";
-  const chWrap=$("chWrap");
-
-  function channelIcon(c){
-    if(c.type==="channel") return `#`;
-    if(c.type==="dm") return `@`;
-    return `💬`;
-  }
-
-  function channelGroups(items){
-    const groups={channel:{label:"Channels",items:[]}, dm:{label:"Direct",items:[]}, thread:{label:"Threads",items:[]}};
-    for(const c of items){
-      const g=groups[c.type];
-      if(!g) groups[c.type]={label:c.type,items:[c]};
-      else g.items.push(c);
-    }
-    return Object.keys(groups).map(k=>({label:groups[k].label, type:k, items:groups[k].items}));
-  }
-
-  function renderSidebar(){
-    if(!s.channels.items.length){
-      chWrap.innerHTML='<div class="muted">no channels</div>';
+  function renderFah(){
+    const wrap=$("fahWrap");
+    const Units=(s.fah||[]);
+    if(!Units.length){
+      wrap.innerHTML='<div class="muted">no active units</div>';
+      $("fahCount").textContent='';
       return;
     }
-    const groups=channelGroups(s.channels.items);
-    chWrap.innerHTML=groups.map(g=>`
-      <div class="chgroup">
-        <div class="chgroup-title">${esc(g.label)}</div>
-        ${g.items.map(c=>{
-          const active=(selectedChannel===c.id)?' active':'';
-          const msgs=(s.channels.messages_by_id[c.id]||[]);
-          const last=(msgs[0]||{});
-          const time=last.ts? last.ts.slice(11,16):'';
-          const preview= esc((c.preview||'')).slice(0,45);
-          return `<div class="ch${active}" data-chat="${esc(c.id)}" style="cursor:pointer;transition:.15s">
-            <div class="ico">${channelIcon(c)}</div>
-            <div class="nm" style="flex:1;min-width:0">
-              <div style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(c.name)||'(unnamed)'}</div>
-              ${preview?`<div style="font-size:.6rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${preview}</div>`:''}
-            </div>
-            <div class="count">${time||''}</div>
-          </div>`;
-        }).join('')}
-      </div>`).join('');
-    chWrap.querySelectorAll('.ch').forEach(row=>{
-      row.onclick=()=>{
-        selectedChannel=row.getAttribute('data-chat');
-        renderSidebar();
-        renderMessages();
-      };
-    });
-  }
-
-  function renderMessages(){
-    const board=$("msgBoard");
-    const chatId=selectedChannel;
-    if(!chatId){
-      board.innerHTML='<div class="muted">select a channel</div>';
-      $("msgCount").textContent='';
-      return;
-    }
-    const msgs=(s.channels.messages_by_id[chatId]||[]);
-    if(!msgs.length){
-      board.innerHTML='<div class="muted">no messages</div>';
-      $("msgCount").textContent='0 messages';
-      return;
-    }
-    $("msgCount").textContent=msgs.length+' messages';
-    const channel=s.channels.items.find(c=>c.id===chatId);
-    const chName=(channel&&channel.name)||chatId;
-
-    let html=`<div class="msg-header"><b># ${esc(chName)}</b><span style="color:var(--muted);margin-left:8px;font-size:.7rem">${esc(channel&&channel.type||'')}</span></div>`;
-
-    let cur='';
-    let rendered=0;
-    msgs.forEach(m=>{
-      const day=m.ts? m.ts.slice(0,10):'';
-      if(day && day!==cur){
-        cur=day;
-        if(day===s.server_date){
-          html+=`<div class="date-sep"><span>Today</span></div>`;
-        } else if(day===new Date(Date.now()-86400000).toISOString().slice(0,10)){
-          html+=`<div class="date-sep"><span>Yesterday</span></div>`;
-        } else {
-          html+=`<div class="date-sep"><span>${esc(day)}</span></div>`;
-        }
-      }
-      const name=m.user||(m.type==='out'?'hermes':'?');
-      const initials=name.slice(0,2).toUpperCase();
-      const hue=(name.split('').reduce((a,b)=>a+b.charCodeAt(0),0)%360);
-      const avatarBg=`hsl(${hue},55%,22%)`;
-      const avatarColor=`hsl(${hue},75%,82%)`;
-      const whoClass=m.type==='out'?'name-out':'name-in';
-      const txt=esc(m.text);
-      html+=`<div class="msg">
-        <div class="avatar" style="background:${avatarBg};color:${avatarColor}">${initials}</div>
-        <div style="flex:1;min-width:0">
-          <div class="meta"><span class="name ${whoClass}">${esc(name)}</span><span>${m.ts? m.ts.slice(11,16):''}</span></div>
-          <div class="txt">${txt}</div>
-        </div>
+    $("fahCount").textContent=Units.length+' units';
+    wrap.innerHTML = Units.map(u => {
+      const pct = u.progress || '--';
+      const barPct = (parseInt(pct) || 0);
+      const interrupted = u.status === 'interrupted';
+      const stColor = interrupted ? 'var(--amber)' : 'var(--green)';
+      const stWord = interrupted ? 'INTERRUPTED' : 'RUNNING';
+      const stIcon = interrupted ? '⏸' : '●';
+      const label = u.project ? `Project ${u.project}` : 'Unknown project';
+      const detail = `Core ${u.core || '?'}` + (u.slot ? ` · slot ${u.slot}` : '');
+      const time = u.completed_steps ? `${u.completed_steps} / ${u.total_steps} steps` : '';
+      return `<div class="fahrow">
+        <div class="ico" style="color:${stColor}">${stIcon}</div>
+        <div class="lbl">${esc(label)} <span style="font-size:.58rem;letter-spacing:1px;color:${stColor}">${stWord}</span><br><span style="color:var(--muted);font-size:.62rem">${esc(detail)}</span></div>
+        <div class="det">${esc(pct)}</div>
+        <div class="bar"><span style="width:${barPct}%"></span></div>
+        <div class="tm">${esc(time)}</div>
       </div>`;
-      rendered++;
-    });
-    board.innerHTML=html;
+    }).join('');
   }
 
-  renderSidebar();
-  if(!selectedChannel && s.channels.items.length){
-    const byTime = s.channels.items.slice().sort((a,b) => {
-      const ta = (a.last_ts || '').replace(/[-: ]/g, '');
-      const tb = (b.last_ts || '').replace(/[-: ]/g, '');
-      return tb.localeCompare(ta);
-    });
-    selectedChannel = byTime[0].id;
-    renderSidebar();
+  function renderSysLine(s){
+    const el=$("sysLine");
+    const d=(s && s.hardware_detail) || {};
+    if(!el) return;
+    const parts = [];
+    const cpu=(d.cpu||'').trim();
+    if(cpu) parts.push(cpu);
+    const gpus=Array.isArray(d.gpus)?d.gpus:[];
+    gpus.forEach((g,i)=>parts.push('GPU'+(gpus.length>1?(' '+(i+1)):'')+': '+g));
+    const ram=Array.isArray(d.ram)?d.ram:[];
+    if(ram.length){
+      const r=ram[0];
+      const cap=typeof r.Capacity==='number'?Math.round(r.Capacity/1024**3)+' GB':'';
+      parts.push('RAM: '+[r.Manufacturer,r.PartNumber,r.SerialNumber,cap].filter(Boolean).join(' · '));
+    }
+    if(ram.length>=2){
+      const r=ram[1];
+      const cap=typeof r.Capacity==='number'?Math.round(r.Capacity/1024**3)+' GB':'';
+      parts.push('RAM2: '+[r.Manufacturer,r.PartNumber,r.SerialNumber,cap].filter(Boolean).join(' · '));
+    }
+    const disks=Array.isArray(d.disks)?d.disks:[];
+    el.innerHTML = parts.length ? parts.join('<br>') : 'no inventory';
   }
+
+  lastState = s;
+  renderFah();
+  renderSysLine(s);
   renderMessages();
 
   const feed=$("feed"); feed.innerHTML=s.activity.length? s.activity.map(e=>{
-    const who=e.type==="in"?`<span class="who">${esc(e.user||'user')}</span> `:e.type==="out"?`<span class="who">hermes</span> `:"";
+    const who=e.type==="in"?`<span class="who">${esc(e.user||'user')}</span> `:`<span class="who">nora</span> `;
     return `<div class="ev ${e.type}"><span class="ico">${evIcon(e.type)}</span><div class="body">${who}<span class="msg">${esc(e.text)}</span></div><span class="tm">${hm(e.ts)}</span></div>`;
   }).join("") : '<div class="muted">no recent activity</div>';
 
 }
 
+function renderMessages(){
+  const s = lastState;
+  if(!s) return;
+  const board=$("msgBoard");
+  const msgs = (s.unified_messages||[]).filter(m => selectedSource==='all' || m.source===selectedSource);
+  if(!msgs.length){
+    board.innerHTML='<div class="muted">no messages</div>';
+    $("msgCount").textContent='0 messages';
+    return;
+  }
+  $("msgCount").textContent=msgs.length+' messages';
+
+  const todayISO=new Date().toISOString().slice(0,10);
+  const yesterdayISO=new Date(Date.now()-86400000).toISOString().slice(0,10);
+  let html=`<div class="msg-header"><b>${esc(selectedSource==='all'?'All messages':selectedSource)}</b></div>`;
+
+  let cur='';
+  msgs.forEach(m=>{
+    const day=m.ts? m.ts.slice(0,10):'';
+    if (day && day!==cur) {
+      cur=day;
+      if (day===todayISO) {
+        html+=`<div class="date-sep"><span>Today</span></div>`;
+      } else if (day===yesterdayISO) {
+        html+=`<div class="date-sep"><span>Yesterday</span></div>`;
+      } else {
+        html+=`<div class="date-sep"><span>${esc(day)}</span></div>`;
+      }
+    }
+    const name=m.user||(m.type==='out'?'nora':'?');
+    const initials=name.slice(0,2).toUpperCase();
+    const avatarUrl = (() => {
+      const n = name.toLowerCase();
+      if (n === 'nora' || n === 'hermes') return (s.avatars && s.avatars.nora) || '';
+      if (n === 'murderszn') return (s.avatars && s.avatars.murderszn) || '';
+      return '';
+    })();
+    const hue=(name.split('').reduce((a,b)=>a+b.charCodeAt(0),0)%360);
+    const avatarBg=`hsl(${hue},55%,22%)`;
+    const avatarColor=`hsl(${hue},75%,82%)`;
+    const whoClass=m.type==='out'?'name-out':'name-in';
+    const txt=esc(m.text || '');
+    html+=`<div class="msg">
+      <div class="avatar" style="${avatarUrl ? '' : `background:${avatarBg};color:${avatarColor}`}">${avatarUrl ? `<img src="${avatarUrl}" alt="${esc(name)}">` : initials}</div>
+      <div style="flex:1;min-width:0">
+        <div class="meta"><span class="name ${whoClass}">${esc(name)} </span><span style="color:var(--muted);margin-left:6px;font-size:.65rem">${esc(m.channel_name||m.source)}</span><span>${m.ts? m.ts.slice(11,16):''}</span></div>
+        <div class="txt">${txt}</div>
+      </div>
+    </div>`;
+  });
+  board.innerHTML=html;
+}
+
 refresh(); setInterval(refresh,5000);
+
+document.querySelectorAll('#msgToggle button').forEach(btn=>{
+  btn.onclick = () => {
+    document.querySelectorAll('#msgToggle button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedSource = btn.getAttribute('data-src');
+    renderMessages();
+  };
+});
+
+const fahPauseBtn=$('fahPause');
+const fahResumeBtn=$('fahResume');
+if(fahPauseBtn){
+  fahPauseBtn.onclick = () => {
+    fetch('/api/fah/pause', {method:'POST', headers:{'Content-Length':'0'}}).then(()=>refresh());
+  };
+}
+if(fahResumeBtn){
+  fahResumeBtn.onclick = () => {
+    fetch('/api/fah/unpause', {method:'POST', headers:{'Content-Length':'0'}}).then(()=>refresh());
+  };
+}
+
+/* ---- hardware sparklines ---- */
+const HW = {cpu:[], gpu:[], ram:[], disk0:[], disk1:[], disk2:[]};
+const MAX_PTS = 40;
+
+function pushBuf(key, val){ HW[key].push(val); if(HW[key].length>MAX_PTS) HW[key].shift(); }
+
+function drawSpark(canvasId, data, color){
+  const c=$(canvasId); if(!c) return;
+  const ctx=c.getContext('2d');
+  const w=c.width, h=c.height;
+  ctx.clearRect(0,0,w,h);
+  if(!data||data.length<2) return;
+  const max=Math.max(...data,1);
+  const step=w/(MAX_PTS-1);
+  ctx.beginPath();
+  ctx.strokeStyle=color||'#fff';
+  ctx.lineWidth=1.8;
+  ctx.lineJoin='round';
+  data.forEach((v,i)=>{
+    const x=i*step;
+    const y=h-(v/max)*(h-4)-2;
+    if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+  // glow fill
+  ctx.lineTo((data.length-1)*step,h);
+  ctx.lineTo(0,h);
+  ctx.closePath();
+  ctx.fillStyle='rgba(255,255,255,0.05)';
+  ctx.fill();
+}
+
+function fmtDisk(pct){ return pct!=null? pct+'%':'--'; }
+function fmtDiskSub(d){
+  if(!d) return '';
+  const gb = d.used_gb!=null && d.total_gb!=null ? `${d.used_gb}/${d.total_gb} GB` : '';
+  return gb;
+}
+function fmtGpuSub(g){
+  if(!g) return '';
+  const mb = g.mem_used!=null && g.mem_total!=null ? `${g.mem_used}/${g.mem_total} MB` : '';
+  const t = g.temp!=null ? `${g.temp}°C` : '';
+  return [mb,t].filter(Boolean).join(' · ');
+}
+function fmtRamSub(r){
+  if(!r) return '';
+  return `${r.used_mb}/${r.total_mb} MB`;
+}
+
+function updateHardware(s){
+  function thresh(el, v){
+    const card = el && el.parentElement;
+    if(!card) return;
+    card.classList.remove('warn','crit');
+    if(v >= 78.6) card.classList.add('crit');
+    else if(v >= 61.8) card.classList.add('warn');
+  }
+  const hw=(s&&s.hardware)||{};
+  const cpu=hw.cpu;
+  const gpu=hw.gpu;
+  const ram=hw.ram;
+  const disks=hw.disks||[];
+
+  if(cpu!=null){
+    $('hCpu').textContent=cpu+'%'; pushBuf('cpu',cpu); thresh($('hCpu'), cpu);
+    $('hCpuSub').textContent='';
+  } else { $('hCpu').textContent='--%'; $('hCpuSub').textContent='N/A'; }
+  if(gpu!=null && typeof gpu==='object'){
+    const u=gpu.usage;
+    $('hGpu').textContent=(u!=null? u+'%':'--%'); pushBuf('gpu',u??0); thresh($('hGpu'), u||0);
+    $('hGpuSub').textContent=fmtGpuSub(gpu);
+  } else { $('hGpu').textContent='--%'; $('hGpuSub').textContent='N/A'; }
+  if(ram!=null && typeof ram==='object'){
+    $('hRam').textContent=ram.pct+'%'; pushBuf('ram',ram.pct); thresh($('hRam'), ram.pct);
+    $('hRamSub').textContent=fmtRamSub(ram);
+  } else { $('hRam').textContent='--%'; $('hRamSub').textContent='N/A'; }
+
+  for(let i=0;i<3;i++){
+    const d=disks[i];
+    const pct=d?d.pct:null;
+    const used=d?d.pct||0:0;
+    if(d!=null){
+      $(`hDisk${i}`).textContent=fmtDisk(pct); pushBuf(`disk${i}`, used); thresh($(`hDisk${i}`), pct||0);
+      $(`hDisk${i}Sub`).textContent=fmtDiskSub(d);
+    } else {
+      $(`hDisk${i}`).textContent='--%'; $(`hDisk${i}Sub`).textContent='N/A';
+      pushBuf(`disk${i}`, 0);
+    }
+  }
+
+  drawSpark('sparkCpu', HW.cpu, '#fff');
+  drawSpark('sparkGpu', HW.gpu, '#fff');
+  drawSpark('sparkRam', HW.ram, '#fff');
+  drawSpark('sparkDisk0', HW.disk0, '#fff');
+  drawSpark('sparkDisk1', HW.disk1, '#fff');
+  drawSpark('sparkDisk2', HW.disk2, '#fff');
+}
+
 </script>
 </body>
 </html>

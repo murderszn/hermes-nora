@@ -1043,7 +1043,7 @@ a {
   width: 100%;
   height: clamp(200px, 26vw, 360px);
   overflow: hidden;
-  background: rgb(249, 174, 42);
+  background: var(--black);
 }
 
 .shader-banner-canvas {

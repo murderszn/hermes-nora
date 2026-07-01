@@ -22,8 +22,21 @@ float hash21(vec2 p){
   return fract(p.x * p.y);
 }
 
+#define CYCLE 88.0
+#define TRAIL 14.0
+
+float wrapDist(float a, float b){
+  float d = abs(a - b);
+  return min(d, CYCLE - d);
+}
+
 float nearHead(float order, float head){
-  return 1.0 - step(2.0, abs(order - head));
+  return 1.0 - step(2.0, wrapDist(order, head));
+}
+
+float inTrail(float order, float head){
+  float dist = mod(head - order + CYCLE, CYCLE);
+  return step(dist, TRAIL);
 }
 
 void main(){
@@ -47,14 +60,18 @@ void main(){
   vec2 cluster3 = floor(id / 3.0);
   vec2 clusterCoord = mix(cluster2, cluster3, step(0.58, chunkRoll));
 
-  float clusterOrder = hash21(clusterCoord * 1.91 + vec2(u_seed * 0.13)) * 88.0;
-  float progress = tick * 1.35;
-  float addressed = step(clusterOrder, progress);
+  float clusterOrder = hash21(clusterCoord * 1.91 + vec2(u_seed * 0.13)) * CYCLE;
 
-  float head0 = mod(tick * 1.9 + u_seed * 3.7, 88.0);
-  float head1 = mod(tick * 2.7 + u_seed * 1.4, 88.0);
-  float head2 = mod(tick * 1.3 + u_seed * 5.1, 88.0);
-  float head3 = mod(tick * 3.1 + u_seed * 2.8, 88.0);
+  float trailHead = mod(tick * 1.35 + u_seed * 0.2, CYCLE);
+  float trailA = inTrail(clusterOrder, trailHead);
+  float trailB = inTrail(clusterOrder, mod(trailHead + CYCLE * 0.33, CYCLE));
+  float trailC = inTrail(clusterOrder, mod(trailHead + CYCLE * 0.66, CYCLE));
+  float addressed = max(trailA, max(trailB, trailC));
+
+  float head0 = mod(tick * 1.9 + u_seed * 3.7, CYCLE);
+  float head1 = mod(tick * 2.7 + u_seed * 1.4, CYCLE);
+  float head2 = mod(tick * 1.3 + u_seed * 5.1, CYCLE);
+  float head3 = mod(tick * 3.1 + u_seed * 2.8, CYCLE);
 
   float clusterActive = 0.0;
   clusterActive = max(clusterActive, nearHead(clusterOrder, head0));
@@ -65,13 +82,12 @@ void main(){
   float pulse = 1.0 - step(0.5, mod(tick, 2.0));
   clusterActive *= pulse;
 
-  float cellOrder = hash21(id + vec2(u_seed * 0.29)) * 160.0;
-  float sparkHead = mod(tick * 4.3 + u_seed * 7.2, 160.0);
+  float cellOrder = hash21(id + vec2(u_seed * 0.29)) * CYCLE;
+  float sparkHead = mod(tick * 4.3 + u_seed * 7.2, CYCLE);
   float cellSpark = nearHead(cellOrder, sparkHead) * pulse;
-  float cellDone = step(cellOrder, tick * 2.2);
 
   float highlighted = clamp(
-    max(addressed, clusterActive * 0.95) + max(cellSpark, cellDone) * 0.85,
+    max(addressed, clusterActive * 0.95) + cellSpark * 0.85,
     0.0, 1.0
   );
 

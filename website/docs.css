@@ -9,10 +9,6 @@
   top: 0;
 }
 
-.nav-active {
-  color: var(--yellow) !important;
-}
-
 .docs-hero {
   background: var(--yellow-bright);
   color: var(--black);
@@ -102,7 +98,7 @@
 
 .docs-toc a:hover {
   color: var(--yellow);
-  border-left-color: rgba(255, 204, 0, 0.4);
+  border-left-color: rgba(var(--yellow-rgb), 0.4);
 }
 
 .docs-content {
@@ -204,8 +200,8 @@
 }
 
 .docs-card--accent {
-  border-color: rgba(255, 204, 0, 0.28);
-  background: rgba(255, 204, 0, 0.04);
+  border-color: rgba(var(--yellow-rgb), 0.28);
+  background: rgba(var(--yellow-rgb), 0.04);
 }
 
 .docs-use-case {
@@ -278,8 +274,8 @@
 }
 
 .docs-callout {
-  background: rgba(255, 204, 0, 0.05);
-  border: 1px solid rgba(255, 204, 0, 0.22);
+  background: rgba(var(--yellow-rgb), 0.05);
+  border: 1px solid rgba(var(--yellow-rgb), 0.22);
   border-radius: var(--radius-panel);
   padding: 1.5rem;
   margin: 1.75rem 0;
@@ -303,7 +299,7 @@
 }
 
 .docs-section--highlight h2 {
-  border-bottom-color: rgba(255, 204, 0, 0.2);
+  border-bottom-color: rgba(var(--yellow-rgb), 0.2);
 }
 
 .docs-cta-inline {
@@ -547,7 +543,7 @@
   font-family: var(--font-mono);
   font-size: 0.875em;
   color: var(--yellow);
-  background: rgba(255, 204, 0, 0.08);
+  background: rgba(var(--yellow-rgb), 0.08);
   padding: 0.125rem 0.375rem;
   border-radius: var(--radius-box);
 }

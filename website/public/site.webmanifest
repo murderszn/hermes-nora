@@ -1,0 +1,21 @@
+{
+  "name": "Nora — Hermes Agent Ops Persona",
+  "short_name": "Nora",
+  "description": "Always-on, locally rooted Hermes agent persona with full machine access.",
+  "start_url": "/hermes-nora/",
+  "display": "standalone",
+  "background_color": "#0a0908",
+  "theme_color": "#fcc22e",
+  "icons": [
+    {
+      "src": "apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

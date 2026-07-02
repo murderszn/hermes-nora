@@ -5,6 +5,8 @@
 
 # hermes-nora
 
+![Nora Preview](nora-preview.png)
+
 Hermes agent persona and ops tools addon — MIT licensed.
 
 Nora is a drop-in persona for [Hermes Agent](https://hermes-agent.nousresearch.com) built on [Nous](https://nousresearch.com) models. She ships with a soul document, a skills library for every connector role, ops tools, and a distinct voice for running your machines.

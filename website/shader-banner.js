@@ -127,7 +127,7 @@ void main(){
   vec2 relId = floor(gv) - centerId;
 
   bool inWord = false;
-  vec2 localId = relId + vec2(7.0, 2.0);
+  vec2 localId = vec2(relId.x + 7.0, 2.0 - relId.y);
   if (localId.x >= -0.5 && localId.x < 15.0 && localId.y >= -0.5 && localId.y < 5.0) {
     inWord = isNora(localId);
   }

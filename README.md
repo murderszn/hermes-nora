@@ -1,8 +1,15 @@
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![GitHub stars](https://img.shields.io/github/stars/murderszn/hermes-nora?style=social)](https://github.com/murderszn/hermes-nora/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/murderszn/hermes-nora?style=social)](https://github.com/murderszn/hermes-nora/network/members)
+[![GitHub issues](https://img.shields.io/github/issues/murderszn/hermes-nora)](https://github.com/murderszn/hermes-nora/issues)
+
 # hermes-nora
 
 Hermes agent persona and ops tools addon — MIT licensed.
 
 Nora is a drop-in persona for [Hermes Agent](https://hermes-agent.nousresearch.com) built on [Nous](https://nousresearch.com) models. She ships with a soul document, a skills library for every connector role, ops tools, and a distinct voice for running your machines.
+
+![Nora hero banner](website/public/hero-banner.png)
 
 ## What's in the box
 

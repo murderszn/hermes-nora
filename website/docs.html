@@ -218,7 +218,7 @@
             <tr>
               <td>Python 3</td>
               <td>Skills, scripts, RPC tools, and automation Hermes delegates to</td>
-              <td><code class="docs-inline-code">python3 --version</code></td>
+              <td><code class="docs-inline-code">python --version</code> <span class="docs-muted">(Windows: <code class="docs-inline-code">python --version</code>; macOS/Linux: <code class="docs-inline-code">python3 --version</code>)</span></td>
             </tr>
             <tr>
               <td>Terminal</td>
@@ -314,8 +314,8 @@ sudo apt update && sudo apt install -y python3 python3-pip python3-venv
 sudo dnf install -y python3 python3-pip</code>
             <div class="docs-verify">
               <p class="docs-verify-label">Verify</p>
-              <code class="docs-code">python3 --version
-pip3 --version</code>
+              <code class="docs-code">python3 --version</code> <span class="docs-muted">(Windows: <code class="docs-inline-code">python --version</code>)</span>
+              <code class="docs-code">pip3 --version</code> <span class="docs-muted">(Windows: <code class="docs-inline-code">pip --version</code>)</span>
             </div>
           </div>
         </div>
@@ -355,6 +355,7 @@ pip3 --version</code>
             <code class="docs-code">irm https://raw.githubusercontent.com/murderszn/hermes-nora/main/install.ps1 | iex</code>
             <p class="docs-subhead">GitHub CLI</p>
             <code class="docs-code">gh repo clone murderszn/hermes-nora && cd hermes-nora && ./bootstrap.sh</code>
+            <p class="docs-muted">Windows / PowerShell: clone then run <code class="docs-inline-code">.ootstrap.ps1</code></p>
             <p>Then point Hermes at the Nora directory per the bootstrap output. Full commands also live on the <a href="index.html#install">home page</a>.</p>
             <div class="docs-verify">
               <p class="docs-verify-label">Verify</p>
@@ -416,7 +417,7 @@ pip3 --version</code>
             <h3>Onboard wizard</h3>
             <p>After install, run the setup wizard — persona, secrets, activate, gateway, verify.</p>
             <code class="docs-code">~/.nora/scripts/onboard.sh</code>
-            <p class="docs-note">Windows: <code class="docs-inline-code">onboard.ps1</code> · Health check: <code class="docs-inline-code">doctor.sh</code></p>
+            <p class="docs-note">Windows: <code class="docs-inline-code">onboard.ps1</code> · Health check: <code class="docs-inline-code">doctor.ps1</code></p>
           </div>
           <div class="docs-card">
             <h3>Channel hub</h3>
@@ -546,7 +547,7 @@ pip3 --version</code>
             <tr><td>Hermes tools</td><td>Terminal, browser, scheduling, memory, subagents</td></tr>
             <tr><td>Browser / computer use</td><td>agent-browser, Playwright — see <a href="roadmap.html#tools">roadmap</a></td></tr>
             <tr><td>MCP</td><td>Model Context Protocol servers via Hermes + Nora skill packs</td></tr>
-            <tr><td>Nora CLI harness</td><td><code class="docs-inline-code">onboard.sh</code>, <code class="docs-inline-code">doctor.sh</code>, <code class="docs-inline-code">activate.sh</code></td></tr>
+            <tr><td>Nora CLI harness</td><td><code class="docs-inline-code">onboard.sh</code> / <code class="docs-inline-code">onboard.ps1</code>, <code class="docs-inline-code">doctor.sh</code> / <code class="docs-inline-code">doctor.ps1</code>, <code class="docs-inline-code">activate.sh</code> / <code class="docs-inline-code">activate.ps1</code></td></tr>
             <tr><td>Discord / Slack / Telegram</td><td>Where you — and your phone — talk to Nora</td></tr>
           </tbody>
         </table>

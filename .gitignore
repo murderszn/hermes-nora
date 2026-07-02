@@ -1,8 +1,24 @@
-.env
-.env.*
-!.env.example
-.DS_Store
+# Dependencies and local secrets
+hermes/.env
+hermes/auth.json
+hermes/config.yaml
+hermes/channel_directory.json
+hermes/discord.defaults.yaml
+hermes/discord_threads.json
+hermes/gateway_state.json
+hermes/processes.json
+hermes/pollinations.defaults.yaml
+
+# Python caches
 __pycache__/
 *.pyc
+.venv/
+venv/
+
+# Browser/Playwright automation state
 .playwright-mcp/
-.playwright-mcp/
+.playwright/
+
+# OS
+.DS_Store
+Thumbs.db
